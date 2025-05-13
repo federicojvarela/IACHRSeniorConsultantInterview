@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Core.Enums;
 
 namespace UnitTests
 {
@@ -15,8 +16,8 @@ namespace UnitTests
 
            
             var loggerFactory = new LoggerFactory(); 
-            var logger = loggerFactory.CreateLogger<LoggerService>(); 
-            var loggerService = new LoggerService(logger); 
+            var logger = loggerFactory.CreateLogger<LoggerServices>(); 
+            var loggerService = new LoggerServices(logger); 
 
             _service = new DocumentProcessorService(
                 _mockDocumentRepository.Object,

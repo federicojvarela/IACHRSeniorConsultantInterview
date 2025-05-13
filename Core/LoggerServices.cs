@@ -8,11 +8,11 @@ public interface ILoggerService
     void LogWarning(string message);
 }
 
-public class LoggerService : ILoggerService
+public class LoggerServices : ILoggerService
 {
-    private readonly ILogger<LoggerService> _logger;
+    private readonly ILogger<LoggerServices> _logger;
 
-    public LoggerService(ILogger<LoggerService> logger)
+    public LoggerServices(ILogger<LoggerServices> logger)
     {
         _logger = logger;
     }

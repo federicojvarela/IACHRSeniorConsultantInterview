@@ -2,7 +2,7 @@
 using Core.Interfaces;
 using Infrastructure.Data;
 using System.Text.Json;
-using System.Threading.Tasks;
+using Core.Enums;
 
 namespace Infrastructure.Repositories
 {

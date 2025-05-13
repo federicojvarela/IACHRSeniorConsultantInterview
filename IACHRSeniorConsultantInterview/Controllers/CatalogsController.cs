@@ -1,5 +1,4 @@
-﻿using Core.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Core.Interfaces;
 using Core.DTOs;
 namespace WebApi.Controllers

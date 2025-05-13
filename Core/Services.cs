@@ -1,24 +1,18 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-
+using Core.Enums;
 namespace Core.Services
 {
     public class DocumentProcessorService
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IDocumentProcessor _documentProcessor;
-        private readonly LoggerService _loggerService;
+        private readonly LoggerServices _loggerService;
 
         public DocumentProcessorService(
             IDocumentRepository documentRepository,
             IDocumentProcessor documentProcessor,
-            LoggerService loggerService)
+            LoggerServices loggerService)
         {
             _documentRepository = documentRepository;
             _documentProcessor = documentProcessor;
@@ -80,7 +74,7 @@ namespace Core.Services
                 document.ProcessingResult = "Procesamiento completado con éxito";
                 _documentRepository.Update(document);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Registrar un mensaje de error genérico sin exponer los detalles de la excepción
                 _loggerService.LogError($"Error procesando el documento: {documentId}. Ocurrió un error durante el procesamiento.");

@@ -3,11 +3,6 @@ using Core.Services;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure
 {
@@ -27,12 +22,12 @@ namespace Infrastructure
 
             // Configuración de almacenamiento
             services.AddSingleton<ICache, InMemoryCache>();
-            services.AddSingleton<LoggerService>();
+            services.AddSingleton<LoggerServices>();
             services.AddSingleton<FileDocumentStorage>(provider => 
                 new FileDocumentStorage(
                     provider.GetRequiredService<ICache>(), 
                     Path.Combine(basePath, "data"), 
-                    provider.GetRequiredService<LoggerService>()
+                    provider.GetRequiredService<LoggerServices>()
                 )
             );
 

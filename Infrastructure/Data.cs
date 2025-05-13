@@ -1,30 +1,9 @@
 ﻿using Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Core.Interfaces;
 
 namespace Infrastructure.Data
 {
-    public interface IDocumentStorage
-    {
-        Document GetById(Guid id);
-        List<Document> GetAll();
-        Document Save(Document document);
-        void Update(Document document);
-        void Delete(Guid id);
-    }
-
-    public interface ICache
-    {
-        Document Get(Guid id);
-        void Set(Guid id, Document document);
-        void Remove(Guid id);
-        void Clear();
-    }
 
     public class FileDocumentStorage : IDocumentStorage
     {
@@ -32,9 +11,9 @@ namespace Infrastructure.Data
         private readonly Dictionary<Guid, Document> _documents;
         private readonly string _documentsFilePath;
         private readonly ICache _cache;
-        private readonly LoggerService _logger;
+        private readonly LoggerServices _logger;
 
-        public FileDocumentStorage(ICache cache, string basePath, LoggerService logger)
+        public FileDocumentStorage(ICache cache, string basePath, LoggerServices logger)
         {
             _cache = cache;
             _basePath = basePath;
@@ -64,7 +43,7 @@ namespace Infrastructure.Data
             if (!_documents.ContainsKey(id))
             {
                 _logger.LogError($"Documento con ID {id} no encontrado.");
-                throw new KeyNotFoundException($"Documento con ID {id} no encontrado.");
+                return null;    
             }
 
             var document = _documents[id];
@@ -125,9 +104,9 @@ namespace Infrastructure.Data
     public class InMemoryCache : ICache
     {
         private readonly Dictionary<Guid, Document> _cache = new();
-        private readonly LoggerService _loggerService;
+        private readonly LoggerServices _loggerService;
         
-        public InMemoryCache(LoggerService loggerService)
+        public InMemoryCache(LoggerServices loggerService)
         {
             _loggerService = loggerService;
         }
@@ -137,7 +116,7 @@ namespace Infrastructure.Data
             if (!_cache.TryGetValue(id, out var doc))
             {
                 _loggerService.LogError($"Documento con ID {id} no encontrado en la caché.");
-                throw new KeyNotFoundException($"Documento con ID {id} no encontrado en la caché.");
+                return null;
             }
             return doc;
         }
