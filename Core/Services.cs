@@ -99,19 +99,19 @@ namespace Core.Services
             _catalogRepository = catalogRepository;
         }
 
-        public Catalog GetCatalog(string id)
+        public async Task<Catalog> GetCatalogAsync(string id) // Cambio a async
         {
-            return _catalogRepository.GetCatalogById(id);
+            return await _catalogRepository.GetCatalogByIdAsync(id);
         }
 
-        public List<Catalog> GetAllCatalogs()
+        public async Task<List<Catalog>> GetAllCatalogsAsync() // Cambio a async
         {
-            return _catalogRepository.GetAllCatalogs();
+            return await _catalogRepository.GetAllCatalogsAsync();
         }
 
-        public CatalogItem GetCatalogItem(string catalogId, string itemId)
+        public async Task<CatalogItem> GetCatalogItemAsync(string catalogId, string itemId) // Cambio a async
         {
-            return _catalogRepository.GetCatalogItem(catalogId, itemId);
+            return await _catalogRepository.GetCatalogItemAsync(catalogId, itemId);
         }
     }
 }

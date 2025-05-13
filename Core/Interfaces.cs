@@ -19,9 +19,9 @@ namespace Core.Interfaces
 
     public interface ICatalogRepository
     {
-        Catalog GetCatalogById(string id);
-        List<Catalog> GetAllCatalogs();
-        CatalogItem GetCatalogItem(string catalogId, string itemId);
+        Task<Catalog> GetCatalogByIdAsync(string id);
+        Task<List<Catalog>> GetAllCatalogsAsync();
+        Task<CatalogItem> GetCatalogItemAsync(string catalogId, string itemId);
     }
     #endregion
 
