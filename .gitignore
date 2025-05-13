@@ -1,0 +1,26 @@
+# Build directories
+bin/
+obj/
+
+# Compiled C# code
+*.dll
+*.exe
+*.pdb
+*.app
+*.apk
+*.ipa
+*.mdb
+*.suo
+*.user
+*.userprefs
+*.sln.docstates
+
+# Visual Studio settings
+/.vs/
+/.vs/IACHRSeniorConsultantInterview/CopilotIndices/17.13.444.19527/SemanticSymbols.db
+/UnitTests/obj/Debug/net8.0/UnitTests.dll
+/UnitTests/obj/Debug/net8.0/ref/UnitTests.dll
+/UnitTests/obj/Debug/net8.0/refint/UnitTests.dll
+Core/obj/Debug/net8.0/Core.AssemblyInfo.cs
+Core/obj/Debug/net8.0/Core.AssemblyInfo.cs
+/Core/obj/Debug/net8.0/Core.AssemblyInfo.cs

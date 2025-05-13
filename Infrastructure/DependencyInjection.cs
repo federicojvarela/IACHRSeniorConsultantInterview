@@ -3,11 +3,6 @@ using Core.Services;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure
 {
@@ -26,7 +21,15 @@ namespace Infrastructure
             Console.WriteLine($"Ruta de catálogos: {catalogsFilePath}");
 
             // Configuración de almacenamiento
-            services.AddSingleton(new FileDocumentStorage(Path.Combine(basePath, "data")));
+            services.AddSingleton<ICache, InMemoryCache>();
+            services.AddSingleton<LoggerServices>();
+            services.AddSingleton<FileDocumentStorage>(provider => 
+                new FileDocumentStorage(
+                    provider.GetRequiredService<ICache>(), 
+                    Path.Combine(basePath, "data"), 
+                    provider.GetRequiredService<LoggerServices>()
+                )
+            );
 
             // Repositorios
             services.AddScoped<IDocumentRepository, DocumentRepository>();

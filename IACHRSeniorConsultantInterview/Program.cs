@@ -1,9 +1,4 @@
 using Infrastructure;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System;
-using System.IO;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-Console.WriteLine("Configurando aplicaciÛn...");
+Console.WriteLine("Configurando aplicaci√≥n...");
 
 // Configurar ruta de datos
 string basePath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data");
@@ -23,21 +18,21 @@ Console.WriteLine($"Ruta base de datos: {basePath}");
 string dataDirectory = Path.Combine(basePath, "data");
 Directory.CreateDirectory(dataDirectory);
 string catalogsDestination = Path.Combine(dataDirectory, "catalogs.json");
-Console.WriteLine($"Ruta de cat·logos: {catalogsDestination}");
+Console.WriteLine($"Ruta de cat√°logos: {catalogsDestination}");
 
-// Verificar explÌcitamente si el archivo de cat·logos existe
+// Verificar expl√≠citamente si el archivo de cat√°logos existe
 if (!File.Exists(catalogsDestination))
 {
-    Console.WriteLine($"El archivo de cat·logos no existe. Cre·ndolo en: {catalogsDestination}");
+    Console.WriteLine($"El archivo de cat√°logos no existe. Cre√°ndolo en: {catalogsDestination}");
 
-    // Cat·logos de ejemplo
+    // Cat√°logos de ejemplo
     var sampleCatalogs = new[]
     {
         new
         {
             id = "document-types",
             name = "Tipos de Documento",
-            description = "Cat·logo de tipos de documentos soportados por el sistema",
+            description = "Cat√°logo de tipos de documentos soportados por el sistema",
             items = new[]
             {
                 new { id = "pdf", name = "PDF", value = "application/pdf" },
@@ -50,7 +45,7 @@ if (!File.Exists(catalogsDestination))
         {
             id = "document-statuses",
             name = "Estados de Documento",
-            description = "Cat·logo de estados posibles de un documento en el sistema",
+            description = "Cat√°logo de estados posibles de un documento en el sistema",
             items = new[]
             {
                 new { id = "pending", name = "Pendiente", value = "0" },
@@ -64,22 +59,22 @@ if (!File.Exists(catalogsDestination))
     // Serializar y guardar
     var json = JsonSerializer.Serialize(sampleCatalogs, new JsonSerializerOptions { WriteIndented = true });
     File.WriteAllText(catalogsDestination, json);
-    Console.WriteLine("Archivo de cat·logos creado exitosamente");
+    Console.WriteLine("Archivo de cat√°logos creado exitosamente");
 }
 else
 {
-    Console.WriteLine("El archivo de cat·logos ya existe");
-    // Verificar que el contenido sea v·lido
+    Console.WriteLine("El archivo de cat√°logos ya existe");
+    // Verificar que el contenido sea v√°lido
     try
     {
         var content = File.ReadAllText(catalogsDestination);
         var catalogs = JsonSerializer.Deserialize<object[]>(content);
-        Console.WriteLine($"El archivo de cat·logos contiene {catalogs?.Length ?? 0} elementos");
+        Console.WriteLine($"El archivo de cat√°logos contiene {catalogs?.Length ?? 0} elementos");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error al leer el archivo de cat·logos: {ex.Message}");
-        Console.WriteLine("Se reemplazar· el archivo con datos v·lidos");
+        Console.WriteLine($"Error al leer el archivo de cat√°logos: {ex.Message}");
+        Console.WriteLine("Se reemplazar√° el archivo con datos v√°lidos");
 
         // Datos de ejemplo
         var sampleCatalogs = new[]
@@ -88,7 +83,7 @@ else
             {
                 id = "document-types",
                 name = "Tipos de Documento",
-                description = "Cat·logo de tipos de documentos soportados por el sistema",
+                description = "Cat√°logo de tipos de documentos soportados por el sistema",
                 items = new[]
                 {
                     new { id = "pdf", name = "PDF", value = "application/pdf" },
@@ -100,12 +95,15 @@ else
         // Serializar y guardar
         var json = JsonSerializer.Serialize(sampleCatalogs, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(catalogsDestination, json);
-        Console.WriteLine("Archivo de cat·logos reemplazado exitosamente");
+        Console.WriteLine("Archivo de cat√°logos reemplazado exitosamente");
     }
 }
 
-// AÒadir infraestructura
+// A√±adir infraestructura
 builder.Services.AddInfrastructure(basePath);
+
+// Configure logging
+builder.Services.AddLogging(configure => configure.AddConsole());
 
 var app = builder.Build();
 
@@ -122,5 +120,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-Console.WriteLine("AplicaciÛn configurada correctamente. Iniciando...");
+Console.WriteLine("Aplicaci√≥n configurada correctamente. Iniciando...");
 app.Run();

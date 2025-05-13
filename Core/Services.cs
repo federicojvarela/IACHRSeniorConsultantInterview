@@ -1,37 +1,44 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using Core.Enums;
 namespace Core.Services
 {
     public class DocumentProcessorService
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IDocumentProcessor _documentProcessor;
+        private readonly LoggerServices _loggerService;
 
         public DocumentProcessorService(
             IDocumentRepository documentRepository,
-            IDocumentProcessor documentProcessor)
+            IDocumentProcessor documentProcessor,
+            LoggerServices loggerService)
         {
             _documentRepository = documentRepository;
             _documentProcessor = documentProcessor;
+            _loggerService = loggerService;
         }
 
         public Document UploadDocument(string fileName, string contentType, byte[] content)
         {
+            _loggerService.LogInformation($"Subiendo documento: {fileName}");
+
+            // Validar entradas
+            if (string.IsNullOrEmpty(fileName))
+            {
+                _loggerService.LogError("El nombre del archivo no puede ser nulo o vacío.");
+                throw new ArgumentException("El nombre del archivo no puede ser nulo o vacío.", nameof(fileName));
+            }
+
             var document = new Document
             {
                 Id = Guid.NewGuid(),
                 FileName = fileName,
-                ContentType = contentType,
+                ContentType =  contentType ?? "default/type", 
                 Content = content,
                 UploadDate = DateTime.UtcNow,
                 Status = ProcessingStatus.Pending,
-                ProcessingResult = null
+                ProcessingResult = string.Empty
             };
 
             var savedDocument = _documentRepository.Save(document);
@@ -45,11 +52,13 @@ namespace Core.Services
         {
             try
             {
+                _loggerService.LogInformation($"Procesando documento: {documentId}");
                 // Obtener el documento del repositorio
                 var document = _documentRepository.GetById(documentId);
                 if (document == null)
                 {
-                    return;
+                    _loggerService.LogWarning($"Documento con ID {documentId} no encontrado.");
+                    return; 
                 }
 
                 document.Status = ProcessingStatus.Processing;
@@ -65,21 +74,29 @@ namespace Core.Services
                 document.ProcessingResult = "Procesamiento completado con éxito";
                 _documentRepository.Update(document);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                // Registrar un mensaje de error genérico sin exponer los detalles de la excepción
+                _loggerService.LogError($"Error procesando el documento: {documentId}. Ocurrió un error durante el procesamiento.");
+                
                 try
                 {
                     var document = _documentRepository.GetById(documentId);
                     if (document != null)
                     {
                         document.Status = ProcessingStatus.Failed;
-                        document.ProcessingResult = $"Error en el procesamiento: {ex.Message}";
+                        document.ProcessingResult = "Error en el procesamiento."; // Mensaje genérico
                         _documentRepository.Update(document);
                     }
+                    else
+                    {
+                        _loggerService.LogWarning($"No se pudo recuperar el documento con ID {documentId} después de un error de procesamiento.");
+                    }
                 }
-                catch
+                catch (Exception innerEx)
                 {
-                    // Logger
+                    // Registrar el error que ocurrió al intentar recuperar el documento
+                    _loggerService.LogError($"Error al recuperar el documento {documentId} después de un fallo en el procesamiento: {innerEx.Message}");
                 }
             }
         }
@@ -99,19 +116,19 @@ namespace Core.Services
             _catalogRepository = catalogRepository;
         }
 
-        public Catalog GetCatalog(string id)
+        public async Task<Catalog> GetCatalogAsync(string id) // Cambio a async
         {
-            return _catalogRepository.GetCatalogById(id);
+            return await _catalogRepository.GetCatalogByIdAsync(id);
         }
 
-        public List<Catalog> GetAllCatalogs()
+        public async Task<List<Catalog>> GetAllCatalogsAsync() // Cambio a async
         {
-            return _catalogRepository.GetAllCatalogs();
+            return await _catalogRepository.GetAllCatalogsAsync();
         }
 
-        public CatalogItem GetCatalogItem(string catalogId, string itemId)
+        public async Task<CatalogItem> GetCatalogItemAsync(string catalogId, string itemId) // Cambio a async
         {
-            return _catalogRepository.GetCatalogItem(catalogId, itemId);
+            return await _catalogRepository.GetCatalogItemAsync(catalogId, itemId);
         }
     }
 }
