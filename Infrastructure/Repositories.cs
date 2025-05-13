@@ -2,6 +2,7 @@
 using Core.Interfaces;
 using Infrastructure.Data;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -46,7 +47,7 @@ namespace Infrastructure.Repositories
     public class CatalogRepository : ICatalogRepository
     {
         private readonly string _catalogFilePath;
-        private List<Catalog> _catalogs;
+        private List<Catalog> _catalogs = new List<Catalog>();
 
         public CatalogRepository(string catalogFilePath)
         {
@@ -74,24 +75,9 @@ namespace Infrastructure.Repositories
                 };
 
                 // Intento de deserialización
-                _catalogs = JsonSerializer.Deserialize<List<Catalog>>(json, options);
+                _catalogs = JsonSerializer.Deserialize<List<Catalog>>(json, options) ?? new List<Catalog>();
 
                 // Comprobación detallada del resultado
-                if (_catalogs == null)
-                {
-                    Console.WriteLine("La deserialización resultó en NULL");
-                    _catalogs = new List<Catalog>();
-                }
-                else
-                {
-                    Console.WriteLine($"Se deserializaron {_catalogs.Count} catálogos");
-                    foreach (var catalog in _catalogs)
-                    {
-                        Console.WriteLine($"Catálogo: Id={catalog.Id}, Name={catalog.Name}, Items={catalog.Items?.Count ?? 0}");
-                    }
-                }
-
-                // Si la deserialización resultó en una lista vacía o con elementos incompletos
                 if (_catalogs.Count == 0 || _catalogs.Any(c => string.IsNullOrEmpty(c.Id)))
                 {
                     throw new InvalidOperationException("El archivo de catálogos está corrupto o los datos no son válidos");
@@ -139,26 +125,26 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public Catalog GetCatalogById(string id)
+        public async Task<Catalog> GetCatalogByIdAsync(string id)
         {
             // Simulamos una consulta lenta
-            Thread.Sleep(500);
-            return _catalogs.FirstOrDefault(c => c.Id == id);
+            await Task.Delay(500);
+            return _catalogs.FirstOrDefault(c => c.Id == id) ?? new Catalog(); // Cambio para evitar null
         }
 
-        public List<Catalog> GetAllCatalogs()
+        public async Task<List<Catalog>> GetAllCatalogsAsync()
         {
             // Simulamos una consulta lenta
-            Thread.Sleep(500);
+            await Task.Delay(500);
             return _catalogs;
         }
 
-        public CatalogItem GetCatalogItem(string catalogId, string itemId)
+        public async Task<CatalogItem> GetCatalogItemAsync(string catalogId, string itemId)
         {
             // Simulamos una consulta lenta
-            Thread.Sleep(300);
+            await Task.Delay(300);
             var catalog = _catalogs.FirstOrDefault(c => c.Id == catalogId);
-            return catalog?.Items.FirstOrDefault(i => i.Id == itemId);
+            return catalog?.Items.FirstOrDefault(i => i.Id == itemId) ?? new CatalogItem(); // Cambio para evitar null  
         }
     }
     #endregion
