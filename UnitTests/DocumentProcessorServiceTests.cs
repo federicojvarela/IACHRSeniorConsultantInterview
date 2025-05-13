@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xunit;
+using Microsoft.Extensions.Logging;
 
 namespace UnitTests
 {
@@ -20,9 +22,17 @@ namespace UnitTests
         {
             _mockDocumentRepository = new Mock<IDocumentRepository>();
             _mockDocumentProcessor = new Mock<IDocumentProcessor>();
+
+           
+            var loggerFactory = new LoggerFactory(); 
+            var logger = loggerFactory.CreateLogger<LoggerService>(); 
+            var loggerService = new LoggerService(logger); 
+
             _service = new DocumentProcessorService(
                 _mockDocumentRepository.Object,
-                _mockDocumentProcessor.Object);
+                _mockDocumentProcessor.Object,
+                loggerService 
+            );
         }
 
         [Fact]

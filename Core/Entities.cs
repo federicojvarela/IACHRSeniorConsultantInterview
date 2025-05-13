@@ -1,16 +1,23 @@
 ﻿using System.Text.Json.Serialization;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Entities
 {
     public class Document
     {
         public Guid Id { get; set; }
-        public string FileName { get; set; }
-        public string ContentType { get; set; }
-        public byte[] Content { get; set; }
+
+        [Required(ErrorMessage = "File name is required.")]
+        public required string FileName { get; set; }
+
+        public string? ContentType { get; set; }
+
+        public byte[]? Content { get; set; }
+
         public DateTime UploadDate { get; set; }
         public ProcessingStatus Status { get; set; }
-        public string ProcessingResult { get; set; }
+        public string? ProcessingResult { get; set; }
     }
 
     public enum ProcessingStatus

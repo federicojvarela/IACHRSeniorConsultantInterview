@@ -26,7 +26,15 @@ namespace Infrastructure
             Console.WriteLine($"Ruta de catálogos: {catalogsFilePath}");
 
             // Configuración de almacenamiento
-            services.AddSingleton(new FileDocumentStorage(Path.Combine(basePath, "data")));
+            services.AddSingleton<ICache, InMemoryCache>();
+            services.AddSingleton<LoggerService>();
+            services.AddSingleton<FileDocumentStorage>(provider => 
+                new FileDocumentStorage(
+                    provider.GetRequiredService<ICache>(), 
+                    Path.Combine(basePath, "data"), 
+                    provider.GetRequiredService<LoggerService>()
+                )
+            );
 
             // Repositorios
             services.AddScoped<IDocumentRepository, DocumentRepository>();

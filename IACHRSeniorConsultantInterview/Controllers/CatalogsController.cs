@@ -1,6 +1,6 @@
 ﻿using Core.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks; // Add this using directive
+using Core.Interfaces;
 
 namespace WebApi.Controllers
 {
@@ -8,9 +8,9 @@ namespace WebApi.Controllers
     [Route("api/[controller]")]
     public class CatalogsController : ControllerBase
     {
-        private readonly CatalogService _catalogService;
+        private readonly ICatalogRepository _catalogService;
 
-        public CatalogsController(CatalogService catalogService)
+        public CatalogsController(ICatalogRepository catalogService)
         {
             _catalogService = catalogService;
         }
@@ -19,19 +19,20 @@ namespace WebApi.Controllers
         public async Task<IActionResult> GetAllCatalogs() // Cambio a async
         {
             var catalogs = await _catalogService.GetAllCatalogsAsync(); // Uso metodo async
-            return Ok(catalogs.Select(c => new
+            var result = catalogs.Select(c => new CatalogDto
             {
-                c.Id,
-                c.Name,
-                c.Description,
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
                 ItemCount = c.Items.Count
-            }));
+            });
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCatalog(string id) // Cambio a async
         {
-            var catalog = await _catalogService.GetCatalogAsync(id); // Uso metodo async
+            var catalog = await _catalogService.GetCatalogByIdAsync(id); // Uso metodo async
             if (catalog == null)
             {
                 return NotFound();
@@ -51,5 +52,13 @@ namespace WebApi.Controllers
 
             return Ok(item);
         }
+    }
+
+    public class CatalogDto
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int ItemCount { get; set; }
     }
 }
