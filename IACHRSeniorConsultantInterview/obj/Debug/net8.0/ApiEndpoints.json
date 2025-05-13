@@ -1,0 +1,81 @@
+[
+  {
+    "ContainingType": "WebApi.Controllers.CatalogsController",
+    "Method": "GetAllCatalogs",
+    "RelativePath": "api/Catalogs",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WebApi.Controllers.CatalogsController",
+    "Method": "GetCatalogItem",
+    "RelativePath": "api/Catalogs/{catalogId}/items/{itemId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "catalogId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "itemId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WebApi.Controllers.CatalogsController",
+    "Method": "GetCatalog",
+    "RelativePath": "api/Catalogs/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WebApi.Controllers.DocumentsController",
+    "Method": "UploadDocument",
+    "RelativePath": "api/Documents",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WebApi.Controllers.DocumentsController",
+    "Method": "GetDocument",
+    "RelativePath": "api/Documents/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
