@@ -6,9 +6,10 @@ namespace Core.Entities
 {
     public class Document
     {
-        public Guid Id { get; set; }
+        [Required(ErrorMessage = "Id es requerido.")]
+        public required Guid Id { get; set; }
 
-        [Required(ErrorMessage = "File name is required.")]
+        [Required(ErrorMessage = "Nombre del archivo requerido.")]
         public required string FileName { get; set; }
 
         public string? ContentType { get; set; }

@@ -40,11 +40,11 @@ namespace Core.Services
             {
                 Id = Guid.NewGuid(),
                 FileName = fileName,
-                ContentType = contentType,
+                ContentType =  contentType ?? "default/type", 
                 Content = content,
                 UploadDate = DateTime.UtcNow,
                 Status = ProcessingStatus.Pending,
-                ProcessingResult = null
+                ProcessingResult = string.Empty
             };
 
             var savedDocument = _documentRepository.Save(document);

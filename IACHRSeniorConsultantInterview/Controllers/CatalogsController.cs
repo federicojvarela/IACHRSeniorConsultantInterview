@@ -1,7 +1,7 @@
 ﻿using Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Core.Interfaces;
-
+using Core.DTOs;
 namespace WebApi.Controllers
 {
     [ApiController]
@@ -38,7 +38,16 @@ namespace WebApi.Controllers
                 return NotFound();
             }
 
-            return Ok(catalog);
+            // Mapear Catalog a CatalogDto
+            var catalogDto = new CatalogDto
+            {
+                Id = catalog.Id,
+                Name = catalog.Name,
+                Description = catalog.Description,
+                ItemCount = catalog.Items.Count
+            };
+
+            return Ok(catalogDto);
         }
 
         [HttpGet("{catalogId}/items/{itemId}")]
@@ -50,15 +59,16 @@ namespace WebApi.Controllers
                 return NotFound();
             }
 
-            return Ok(item);
+            // Mapear CatalogItem a CatalogItemDto
+            var itemDto = new CatalogItemDto
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Value = item.Value
+            };
+
+            return Ok(itemDto);
         }
     }
 
-    public class CatalogDto
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public int ItemCount { get; set; }
-    }
 }
