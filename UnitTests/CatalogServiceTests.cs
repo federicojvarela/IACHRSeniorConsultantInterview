@@ -1,9 +1,3 @@
-using Core.Entities;
-using Core.Interfaces;
-using Core.Services;
-using Moq;
-using System.Collections.Generic;
-using Xunit;
 
 namespace UnitTests
 {
