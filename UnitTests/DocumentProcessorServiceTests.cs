@@ -8,13 +8,14 @@ namespace UnitTests
         private readonly Mock<IDocumentRepository> _mockDocumentRepository;
         private readonly Mock<IDocumentProcessor> _mockDocumentProcessor;
         private readonly DocumentProcessorService _service;
+        private readonly Mock<ICache> _mockCache;
 
         public DocumentProcessorServiceTests()
         {
             _mockDocumentRepository = new Mock<IDocumentRepository>();
             _mockDocumentProcessor = new Mock<IDocumentProcessor>();
+            _mockCache = new Mock<ICache>();
 
-           
             var loggerFactory = new LoggerFactory(); 
             var logger = loggerFactory.CreateLogger<LoggerServices>(); 
             var loggerService = new LoggerServices(logger); 
@@ -22,12 +23,13 @@ namespace UnitTests
             _service = new DocumentProcessorService(
                 _mockDocumentRepository.Object,
                 _mockDocumentProcessor.Object,
-                loggerService 
+                loggerService,
+                _mockCache.Object
             );
         }
 
         [Fact]
-        public void UploadDocument_ShouldSaveAndProcessDocument()
+        public async Task UploadDocument_ShouldSaveAndProcessDocument()
         {
             // Arrange
             var fileName = "test.pdf";
@@ -43,44 +45,44 @@ namespace UnitTests
                 Status = ProcessingStatus.Pending
             };
 
-            // Setup mock para Save - guarda el documento inicial
-            _mockDocumentRepository.Setup(r => r.Save(It.IsAny<Document>()))
-                .Returns(savedDocument);
+            // Setup mock para SaveAsync - guarda el documento inicial
+            _mockDocumentRepository.Setup(r => r.SaveAsync(It.IsAny<Document>()))
+                .ReturnsAsync(savedDocument);
 
-            // Setup mock para GetById - necesario para ProcessDocumentSync
-            _mockDocumentRepository.Setup(r => r.GetById(documentId))
-                .Returns(savedDocument);
+            // Setup mock para GetByIdAsync - necesario para ProcessDocumentSync
+            _mockDocumentRepository.Setup(r => r.GetByIdAsync(documentId))
+                .ReturnsAsync(savedDocument);
 
             // Setup mock para Update - necesario para ProcessDocumentSync
-            _mockDocumentRepository.Setup(r => r.Update(It.IsAny<Document>()))
+            _mockDocumentRepository.Setup(r => r.UpdateAsync(It.IsAny<Document>()))
                 .Callback<Document>(d => savedDocument = d);
 
             // Act
-            var result = _service.UploadDocument(fileName, contentType, content);
+            var result = await _service.UploadDocumentAsync(fileName, contentType, content);
 
             // Assert
             Assert.Equal(savedDocument.Id, result.Id);
             Assert.Equal(fileName, result.FileName);
             Assert.Equal(contentType, result.ContentType);
 
-            _mockDocumentRepository.Verify(r => r.Save(It.IsAny<Document>()), Times.Once);
+            _mockDocumentRepository.Verify(r => r.SaveAsync(It.IsAny<Document>()), Times.Once);
             _mockDocumentProcessor.Verify(p => p.ProcessDocument(It.IsAny<Document>()), Times.Once);
         }
 
         [Fact]
-        public void GetDocument_ShouldReturnDocumentFromRepository()
+        public async Task GetDocument_ShouldReturnDocumentFromRepository()
         {
             // Arrange
             var docId = Guid.NewGuid();
             var document = new Document { Id = docId, FileName = "test.pdf" };
-            _mockDocumentRepository.Setup(r => r.GetById(docId)).Returns(document);
+            _mockDocumentRepository.Setup(r => r.GetByIdAsync(docId)).ReturnsAsync(document);
 
             // Act
-            var result = _service.GetDocument(docId);
+            var result = await _service.GetDocument(docId);
 
             // Assert
             Assert.Equal(document, result);
-            _mockDocumentRepository.Verify(r => r.GetById(docId), Times.Once);
+            _mockDocumentRepository.Verify(r => r.GetByIdAsync(docId), Times.Once);
         }
     }
 }

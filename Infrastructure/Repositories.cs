@@ -16,29 +16,29 @@ namespace Infrastructure.Repositories
             _storage = storage;
         }
 
-        public Document GetById(Guid id)
+        public async Task<List<Document>> GetAllAsync()
         {
-            return _storage.GetById(id);
+            return await _storage.GetAllAsync();
         }
 
-        public List<Document> GetAll()
+        public async Task<Document> GetByIdAsync(Guid id)
         {
-            return _storage.GetAll();
+            return await Task.Run(() => _storage.GetByIdAsync(id));
         }
 
-        public Document Save(Document document)
+        public async Task<Document> SaveAsync(Document document)
         {
-            return _storage.Save(document);
+            return await Task.Run(() => _storage.Save(document));
         }
 
-        public void Update(Document document)
+        public async Task UpdateAsync(Document document)
         {
-            _storage.Update(document);
+            await Task.Run(() => _storage.Update(document));
         }
 
-        public void Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            _storage.Delete(id);
+            await Task.Run(() => _storage.Delete(id));
         }
     }
     #endregion
@@ -159,12 +159,12 @@ namespace Infrastructure.Repositories
             _documentRepository = documentRepository;
         }
 
-        public void ProcessDocument(Document document)
+        public async Task ProcessDocument(Document document)
         {
             // Simulación simple de procesamiento
 
             // Simular trabajo que toma tiempo
-            Thread.Sleep(3000);
+            await Task.Delay(3000);
 
             // Actualizar el documento con el resultado del procesamiento
             document.Status = ProcessingStatus.Completed;
@@ -189,12 +189,12 @@ namespace Infrastructure.Repositories
                     break;
             }
 
-            _documentRepository.Update(document);
+            await _documentRepository.UpdateAsync(document);
         }
 
-        public ProcessingStatus CheckStatus(Guid documentId)
+        public async Task<ProcessingStatus> CheckStatusAsync(Guid documentId)
         {
-            var document = _documentRepository.GetById(documentId);
+            var document = await _documentRepository.GetByIdAsync(documentId);
             return document?.Status ?? ProcessingStatus.Failed;
         }
     }

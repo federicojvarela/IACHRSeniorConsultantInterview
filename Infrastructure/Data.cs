@@ -1,6 +1,8 @@
 ﻿using Core.Entities;
 using System.Text.Json;
 using Core.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Data
 {
@@ -35,51 +37,87 @@ namespace Infrastructure.Data
             }
         }
 
-        public Document GetById(Guid id)
+        public async Task<Document?> GetByIdAsync(Guid id)
         {
-            var cachedDocument = _cache.Get(id);
+            var cacheKey = $"document_{id}";
+            var cachedDocument = await _cache.GetAsync<Document>(cacheKey);
             if (cachedDocument != null) return cachedDocument;
 
             if (!_documents.ContainsKey(id))
             {
                 _logger.LogError($"Documento con ID {id} no encontrado.");
-                return null;    
+                return null;
             }
 
             var document = _documents[id];
-            _cache.Set(id, document);
+            await _cache.SetAsync(cacheKey, document, TimeSpan.FromMinutes(30));
             return document;
         }
 
-        public List<Document> GetAll()
+
+        public async Task<List<Document>> GetAllAsync()
         {
-            return new List<Document>(_documents.Values);
+            return await Task.Run(() => new List<Document>(_documents.Values));
         }
 
-        public Document Save(Document document)
+        public async Task<Document> Save(Document document)
         {
             _documents[document.Id] = document;
-            _cache.Set(document.Id, document);
+            var cacheKey = $"document_{document.Id}";
+            await _cache.SetAsync(cacheKey, document, TimeSpan.FromMinutes(30));
             SaveDocuments();
             return document;
         }
 
-        public void Update(Document document)
+        public async Task Update(Document document)
         {
             if (_documents.ContainsKey(document.Id))
             {
                 _documents[document.Id] = document;
-                _cache.Set(document.Id, document);
+                var cacheKey = $"document_{document.Id}";
+                await _cache.SetAsync(cacheKey, document, TimeSpan.FromMinutes(30));
                 SaveDocuments();
             }
         }
 
-        public void Delete(Guid id)
+        public async Task Delete(Guid id)
         {
             if (_documents.ContainsKey(id))
             {
                 _documents.Remove(id);
-                _cache.Remove(id);
+                var cacheKey = $"document_{id}";
+                await _cache.RemoveAsync(cacheKey);
+                SaveDocuments();
+            }
+        }
+
+        public async Task<Document> SaveAsync(Document document)
+        {
+            _documents[document.Id] = document;
+            var cacheKey = $"document_{document.Id}";
+            await _cache.SetAsync(cacheKey, document, TimeSpan.FromMinutes(30));
+            SaveDocuments();
+            return document;
+        }
+
+        public async Task UpdateAsync(Document document)
+        {
+            if (_documents.ContainsKey(document.Id))
+            {
+                _documents[document.Id] = document;
+                var cacheKey = $"document_{document.Id}";
+                await _cache.SetAsync(cacheKey, document, TimeSpan.FromMinutes(30));
+                SaveDocuments();
+            }
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            if (_documents.ContainsKey(id))
+            {
+                _documents.Remove(id);
+                var cacheKey = $"document_{id}";
+                await _cache.RemoveAsync(cacheKey);
                 SaveDocuments();
             }
         }
@@ -90,38 +128,55 @@ namespace Infrastructure.Data
             File.WriteAllText(_documentsFilePath, json);
         }
 
-        public void InvalidateCache(Guid id)
+        public async Task InvalidateCacheAsync(Guid id)
         {
-            _cache.Remove(id);
+            await _cache.RemoveAsync($"document_{id}");
         }
 
-        public void InvalidateAllCache()
+        public async Task InvalidateAllCacheAsync()
         {
-            _cache.Clear();
+            await _cache.ClearAsync();
         }
     }
 
-    public class InMemoryCache : ICache
+public class InMemoryCache : ICache
+{
+    private readonly Dictionary<string, object> _cache = new();
+    private readonly LoggerServices _loggerService;
+
+    public InMemoryCache(LoggerServices loggerService)
     {
-        private readonly Dictionary<Guid, Document> _cache = new();
-        private readonly LoggerServices _loggerService;
-        
-        public InMemoryCache(LoggerServices loggerService)
+        _loggerService = loggerService;
+    }
+
+    public Task<T?> GetAsync<T>(string key)
+    {
+        if (_cache.TryGetValue(key, out var value) && value is T typed)
         {
-            _loggerService = loggerService;
+            return Task.FromResult<T?>(typed);
         }
 
-        public Document Get(Guid id)
-        {
-            if (!_cache.TryGetValue(id, out var doc))
-            {
-                _loggerService.LogError($"Documento con ID {id} no encontrado en la caché.");
-                return null;
-            }
-            return doc;
-        }
-        public void Set(Guid id, Document document) => _cache[id] = document;
-        public void Remove(Guid id) => _cache.Remove(id);
-        public void Clear() => _cache.Clear();
+        _loggerService.LogError($"Elemento con clave {key} no encontrado en la caché.");
+        return Task.FromResult<T?>(default);
     }
+
+    public Task SetAsync<T>(string key, T value, TimeSpan? expiry = null)
+    {
+        _cache[key] = value!;
+        return Task.CompletedTask;
+    }
+
+    public Task RemoveAsync(string key)
+    {
+        _cache.Remove(key);
+        return Task.CompletedTask;
+    }
+
+    public Task ClearAsync()
+    {
+        _cache.Clear();
+        return Task.CompletedTask;
+    }
+}
+
 }

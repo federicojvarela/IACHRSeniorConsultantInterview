@@ -5,7 +5,7 @@ namespace Core.Interfaces
 {
     public interface IDocumentProcessor
     {
-        void ProcessDocument(Document document);
-        ProcessingStatus CheckStatus(Guid documentId);
+        Task ProcessDocument(Document document);
+        Task<ProcessingStatus> CheckStatusAsync(Guid documentId);
     }
 }

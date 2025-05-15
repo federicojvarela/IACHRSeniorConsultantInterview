@@ -9,17 +9,21 @@ namespace Core.Services
         private readonly IDocumentProcessor _documentProcessor;
         private readonly LoggerServices _loggerService;
 
+        private readonly ICache _cache;
+
         public DocumentProcessorService(
             IDocumentRepository documentRepository,
             IDocumentProcessor documentProcessor,
-            LoggerServices loggerService)
+            LoggerServices loggerService,
+            ICache cache)
         {
             _documentRepository = documentRepository;
             _documentProcessor = documentProcessor;
             _loggerService = loggerService;
+            _cache = cache;
         }
 
-        public Document UploadDocument(string fileName, string contentType, byte[] content)
+        public async Task<Document> UploadDocumentAsync(string fileName, string contentType, byte[] content)
         {
             _loggerService.LogInformation($"Subiendo documento: {fileName}");
 
@@ -41,20 +45,20 @@ namespace Core.Services
                 ProcessingResult = string.Empty
             };
 
-            var savedDocument = _documentRepository.Save(document);
+            var savedDocument = await _documentRepository.SaveAsync(document);
 
-            ProcessDocumentSync(savedDocument.Id);
+            await ProcessDocumentAsync(savedDocument.Id);
 
             return savedDocument;
         }
 
-        private void ProcessDocumentSync(Guid documentId)
+        private async Task ProcessDocumentAsync(Guid documentId)
         {
             try
             {
                 _loggerService.LogInformation($"Procesando documento: {documentId}");
                 // Obtener el documento del repositorio
-                var document = _documentRepository.GetById(documentId);
+                var document = await _documentRepository.GetByIdAsync(documentId);
                 if (document == null)
                 {
                     _loggerService.LogWarning($"Documento con ID {documentId} no encontrado.");
@@ -62,17 +66,17 @@ namespace Core.Services
                 }
 
                 document.Status = ProcessingStatus.Processing;
-                _documentRepository.Update(document);
+                await _documentRepository.UpdateAsync(document);
 
                 // Simular procesamiento que toma tiempo
-                Thread.Sleep(2000);
+                await Task.Delay(2000);
 
                 // Procesar el documento
-                _documentProcessor.ProcessDocument(document);
+                await _documentProcessor.ProcessDocument(document);
 
                 document.Status = ProcessingStatus.Completed;
                 document.ProcessingResult = "Procesamiento completado con éxito";
-                _documentRepository.Update(document);
+                await _documentRepository.UpdateAsync(document);
             }
             catch (Exception)
             {
@@ -81,12 +85,12 @@ namespace Core.Services
                 
                 try
                 {
-                    var document = _documentRepository.GetById(documentId);
+                    var document = await _documentRepository.GetByIdAsync(documentId);
                     if (document != null)
                     {
                         document.Status = ProcessingStatus.Failed;
                         document.ProcessingResult = "Error en el procesamiento."; // Mensaje genérico
-                        _documentRepository.Update(document);
+                        await _documentRepository.UpdateAsync(document);
                     }
                     else
                     {
@@ -101,9 +105,9 @@ namespace Core.Services
             }
         }
 
-        public Document GetDocument(Guid id)
+        public async Task<Document> GetDocument(Guid id)
         {
-            return _documentRepository.GetById(id);
+            return await _documentRepository.GetByIdAsync(id);
         }
     }
 

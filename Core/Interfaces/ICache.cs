@@ -1,12 +1,10 @@
-using Core.Entities;
-
 namespace Core.Interfaces
 {
     public interface ICache
     {
-        Document Get(Guid id);
-        void Set(Guid id, Document document);
-        void Remove(Guid id);
-        void Clear();
+        Task<T?> GetAsync<T>(string key);
+        Task SetAsync<T>(string key, T value, TimeSpan? expiry = null);
+        Task RemoveAsync(string key);
+        Task ClearAsync();
     }
 }

@@ -5,10 +5,10 @@ namespace Core.Interfaces
 {
     public interface IDocumentRepository
     {
-        Document GetById(Guid id);
-        List<Document> GetAll();
-        Document Save(Document document);
-        void Update(Document document);
-        void Delete(Guid id);
+        Task<Document> GetByIdAsync(Guid id);
+        Task<List<Document>> GetAllAsync();
+        Task<Document> SaveAsync(Document document);
+        Task UpdateAsync(Document document);
+        Task DeleteAsync(Guid id);
     }
 }

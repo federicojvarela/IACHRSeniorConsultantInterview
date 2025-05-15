@@ -15,9 +15,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetDocument(Guid id)
+        public async Task<IActionResult> GetDocument(Guid id)
         {
-            var document = _documentProcessorService.GetDocument(id);
+            var document = await _documentProcessorService.GetDocument(id);
             if (document == null)
             {
                 return NotFound();
@@ -35,7 +35,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult UploadDocument(IFormFile file)
+        public async Task<IActionResult> UploadDocument(IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
@@ -45,7 +45,7 @@ namespace WebApi.Controllers
             using (var memoryStream = new MemoryStream())
             {
                 file.CopyTo(memoryStream);
-                var document = _documentProcessorService.UploadDocument(
+                var document = await _documentProcessorService.UploadDocumentAsync(
                     file.FileName,
                     file.ContentType,
                     memoryStream.ToArray()
