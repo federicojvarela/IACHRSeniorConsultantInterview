@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Core.Enums;
+using Core.Services.Documents;
 
 namespace UnitTests
 {
@@ -7,7 +8,7 @@ namespace UnitTests
     {
         private readonly Mock<IDocumentRepository> _mockDocumentRepository;
         private readonly Mock<IDocumentProcessor> _mockDocumentProcessor;
-        private readonly DocumentProcessorService _service;
+        private readonly DocumentService _service;
         private readonly Mock<ICache> _mockCache;
 
         public DocumentProcessorServiceTests()
@@ -20,11 +21,10 @@ namespace UnitTests
             var logger = loggerFactory.CreateLogger<LoggerServices>(); 
             var loggerService = new LoggerServices(logger); 
 
-            _service = new DocumentProcessorService(
+            _service = new DocumentService(
                 _mockDocumentRepository.Object,
                 _mockDocumentProcessor.Object,
-                loggerService,
-                _mockCache.Object
+                loggerService
             );
         }
 

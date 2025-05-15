@@ -1,26 +1,26 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
 using Core.Enums;
-namespace Core.Services
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Core.Services.Documents
 {
-    public class DocumentProcessorService
+    public class DocumentService
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IDocumentProcessor _documentProcessor;
         private readonly LoggerServices _loggerService;
 
-        private readonly ICache _cache;
-
-        public DocumentProcessorService(
+        public DocumentService(
             IDocumentRepository documentRepository,
             IDocumentProcessor documentProcessor,
-            LoggerServices loggerService,
-            ICache cache)
+            LoggerServices loggerService)
         {
             _documentRepository = documentRepository;
             _documentProcessor = documentProcessor;
             _loggerService = loggerService;
-            _cache = cache;
         }
 
         public async Task<Document> UploadDocumentAsync(string fileName, string contentType, byte[] content)
@@ -38,7 +38,7 @@ namespace Core.Services
             {
                 Id = Guid.NewGuid(),
                 FileName = fileName,
-                ContentType =  contentType ?? "default/type", 
+                ContentType = contentType ?? "default/type",
                 Content = content,
                 UploadDate = DateTime.UtcNow,
                 Status = ProcessingStatus.Pending,
@@ -62,7 +62,7 @@ namespace Core.Services
                 if (document == null)
                 {
                     _loggerService.LogWarning($"Documento con ID {documentId} no encontrado.");
-                    return; 
+                    return;
                 }
 
                 document.Status = ProcessingStatus.Processing;
@@ -82,7 +82,7 @@ namespace Core.Services
             {
                 // Registrar un mensaje de error genérico sin exponer los detalles de la excepción
                 _loggerService.LogError($"Error procesando el documento: {documentId}. Ocurrió un error durante el procesamiento.");
-                
+
                 try
                 {
                     var document = await _documentRepository.GetByIdAsync(documentId);
@@ -108,31 +108,6 @@ namespace Core.Services
         public async Task<Document> GetDocument(Guid id)
         {
             return await _documentRepository.GetByIdAsync(id);
-        }
-    }
-
-    public class CatalogService
-    {
-        private readonly ICatalogRepository _catalogRepository;
-
-        public CatalogService(ICatalogRepository catalogRepository)
-        {
-            _catalogRepository = catalogRepository;
-        }
-
-        public async Task<Catalog> GetCatalogAsync(string id) // Cambio a async
-        {
-            return await _catalogRepository.GetCatalogByIdAsync(id);
-        }
-
-        public async Task<List<Catalog>> GetAllCatalogsAsync() // Cambio a async
-        {
-            return await _catalogRepository.GetAllCatalogsAsync();
-        }
-
-        public async Task<CatalogItem> GetCatalogItemAsync(string catalogId, string itemId) // Cambio a async
-        {
-            return await _catalogRepository.GetCatalogItemAsync(catalogId, itemId);
         }
     }
 }

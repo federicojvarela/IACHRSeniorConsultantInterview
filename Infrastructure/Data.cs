@@ -13,27 +13,32 @@ namespace Infrastructure.Data
         private readonly Dictionary<Guid, Document> _documents;
         private readonly string _documentsFilePath;
         private readonly ICache _cache;
-        private readonly LoggerServices _logger;
+       private readonly ILoggerService _logger;
 
-        public FileDocumentStorage(ICache cache, string basePath, LoggerServices logger)
+       private readonly IFileSystemService _fileSystem;
+
+
+        public FileDocumentStorage(ICache cache, ILoggerService logger, IFileSystemService fileSystem, string basePath)
         {
             _cache = cache;
             _basePath = basePath;
             _documentsFilePath = Path.Combine(_basePath, "documents.json");
             _logger = logger;
+            _fileSystem = fileSystem;
+
 
             Directory.CreateDirectory(_basePath);
 
-            if (File.Exists(_documentsFilePath))
-            {
-                var json = File.ReadAllText(_documentsFilePath);
+            _fileSystem.EnsureDirectoryExists(_basePath);
+            if (_fileSystem.FileExists(_documentsFilePath))
+             {
+                var json = _fileSystem.ReadFileAsync(_documentsFilePath).Result;
                 _documents = JsonSerializer.Deserialize<Dictionary<Guid, Document>>(json)
                     ?? new Dictionary<Guid, Document>();
             }
             else
             {
-                _documents = new Dictionary<Guid, Document>();
-                SaveDocuments();
+                _documents = new Dictionary<Guid, Document>();                
             }
         }
 
@@ -55,48 +60,18 @@ namespace Infrastructure.Data
         }
 
 
-        public async Task<List<Document>> GetAllAsync()
+        public Task<List<Document>> GetAllAsync()
         {
-            return await Task.Run(() => new List<Document>(_documents.Values));
+            return Task.FromResult(_documents.Values.ToList());
         }
 
-        public async Task<Document> Save(Document document)
-        {
-            _documents[document.Id] = document;
-            var cacheKey = $"document_{document.Id}";
-            await _cache.SetAsync(cacheKey, document, TimeSpan.FromMinutes(30));
-            SaveDocuments();
-            return document;
-        }
-
-        public async Task Update(Document document)
-        {
-            if (_documents.ContainsKey(document.Id))
-            {
-                _documents[document.Id] = document;
-                var cacheKey = $"document_{document.Id}";
-                await _cache.SetAsync(cacheKey, document, TimeSpan.FromMinutes(30));
-                SaveDocuments();
-            }
-        }
-
-        public async Task Delete(Guid id)
-        {
-            if (_documents.ContainsKey(id))
-            {
-                _documents.Remove(id);
-                var cacheKey = $"document_{id}";
-                await _cache.RemoveAsync(cacheKey);
-                SaveDocuments();
-            }
-        }
 
         public async Task<Document> SaveAsync(Document document)
         {
             _documents[document.Id] = document;
             var cacheKey = $"document_{document.Id}";
             await _cache.SetAsync(cacheKey, document, TimeSpan.FromMinutes(30));
-            SaveDocuments();
+            await SaveDocumentsAsync();
             return document;
         }
 
@@ -107,7 +82,7 @@ namespace Infrastructure.Data
                 _documents[document.Id] = document;
                 var cacheKey = $"document_{document.Id}";
                 await _cache.SetAsync(cacheKey, document, TimeSpan.FromMinutes(30));
-                SaveDocuments();
+                await SaveDocumentsAsync();
             }
         }
 
@@ -118,15 +93,16 @@ namespace Infrastructure.Data
                 _documents.Remove(id);
                 var cacheKey = $"document_{id}";
                 await _cache.RemoveAsync(cacheKey);
-                SaveDocuments();
+                await SaveDocumentsAsync();
             }
         }
 
-        private void SaveDocuments()
+        private async Task SaveDocumentsAsync()
         {
             var json = JsonSerializer.Serialize(_documents);
-            File.WriteAllText(_documentsFilePath, json);
+            await _fileSystem.WriteFileAsync(_documentsFilePath, json);
         }
+
 
         public async Task InvalidateCacheAsync(Guid id)
         {
@@ -139,44 +115,6 @@ namespace Infrastructure.Data
         }
     }
 
-public class InMemoryCache : ICache
-{
-    private readonly Dictionary<string, object> _cache = new();
-    private readonly LoggerServices _loggerService;
 
-    public InMemoryCache(LoggerServices loggerService)
-    {
-        _loggerService = loggerService;
-    }
-
-    public Task<T?> GetAsync<T>(string key)
-    {
-        if (_cache.TryGetValue(key, out var value) && value is T typed)
-        {
-            return Task.FromResult<T?>(typed);
-        }
-
-        _loggerService.LogError($"Elemento con clave {key} no encontrado en la caché.");
-        return Task.FromResult<T?>(default);
-    }
-
-    public Task SetAsync<T>(string key, T value, TimeSpan? expiry = null)
-    {
-        _cache[key] = value!;
-        return Task.CompletedTask;
-    }
-
-    public Task RemoveAsync(string key)
-    {
-        _cache.Remove(key);
-        return Task.CompletedTask;
-    }
-
-    public Task ClearAsync()
-    {
-        _cache.Clear();
-        return Task.CompletedTask;
-    }
-}
 
 }

@@ -1,5 +1,6 @@
 ﻿using Core.Interfaces;
-using Core.Services;
+using Core.Services.Catalogs;
+using Core.Services.Documents;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,15 +22,17 @@ namespace Infrastructure
             Console.WriteLine($"Ruta de catálogos: {catalogsFilePath}");
 
             // Configuración de almacenamiento
-            services.AddSingleton<ICache, InMemoryCache>();
-            services.AddSingleton<LoggerServices>();
-            services.AddSingleton<FileDocumentStorage>(provider => 
-                new FileDocumentStorage(
-                    provider.GetRequiredService<ICache>(), 
-                    Path.Combine(basePath, "data"), 
-                    provider.GetRequiredService<LoggerServices>()
-                )
-            );
+            services.AddSingleton<ICache, MemoryCacheService>();
+            services.AddSingleton<ILoggerService, LoggerServices>();
+services.AddSingleton<FileDocumentStorage>(provider =>
+    new FileDocumentStorage(
+        provider.GetRequiredService<ICache>(),
+        provider.GetRequiredService<ILoggerService>(),
+        provider.GetRequiredService<IFileSystemService>(),
+        Path.Combine(basePath, "data")
+    )
+);
+
 
             // Repositorios
             services.AddScoped<IDocumentRepository, DocumentRepository>();
@@ -42,7 +45,7 @@ namespace Infrastructure
             services.AddScoped<IDocumentProcessor, SimpleDocumentProcessor>();
 
             // Servicios
-            services.AddScoped<DocumentProcessorService>();
+            services.AddScoped<DocumentService>();
             services.AddScoped<CatalogService>();
 
             Console.WriteLine("Infraestructura configurada correctamente");

@@ -1,4 +1,4 @@
-﻿using Core.Services;
+﻿using Core.Services.Documents;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
@@ -7,17 +7,17 @@ namespace WebApi.Controllers
     [Route("api/[controller]")]
     public class DocumentsController : ControllerBase
     {
-        private readonly DocumentProcessorService _documentProcessorService;
+        private readonly DocumentService _documentService;
 
-        public DocumentsController(DocumentProcessorService documentProcessorService)
+        public DocumentsController(DocumentService documentService)
         {
-            _documentProcessorService = documentProcessorService;
+            _documentService = documentService;
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDocument(Guid id)
         {
-            var document = await _documentProcessorService.GetDocument(id);
+            var document = await _documentService.GetDocument(id);
             if (document == null)
             {
                 return NotFound();
@@ -45,7 +45,7 @@ namespace WebApi.Controllers
             using (var memoryStream = new MemoryStream())
             {
                 file.CopyTo(memoryStream);
-                var document = await _documentProcessorService.UploadDocumentAsync(
+                var document = await _documentService.UploadDocumentAsync(
                     file.FileName,
                     file.ContentType,
                     memoryStream.ToArray()
