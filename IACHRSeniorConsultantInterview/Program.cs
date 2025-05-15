@@ -1,11 +1,22 @@
 using Infrastructure;
 using Infrastructure.Storage;
 using System.Text.Json;
+using FluentValidation.AspNetCore;
+using FluentValidation;
+using Core.Validation;
 
+// Crear el builder de la aplicación web
 var builder = WebApplication.CreateBuilder(args);
 
 // Agregar servicios al contenedor
 builder.Services.AddControllers();
+
+// Configuración de FluentValidation
+builder.Services.AddFluentValidationAutoValidation(); // Validación automática en los endpoints
+builder.Services.AddFluentValidationClientsideAdapters(); // Para MVC y Swagger si usás anotaciones
+builder.Services.AddValidatorsFromAssemblyContaining<UploadDocumentRequestValidator>(); // Registro de tus validadores
+
+// Agregar servicios de API y documentación
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -57,7 +68,7 @@ if (!File.Exists(catalogsDestination))
         }
     };
 
-    // Serializar y guardar
+    // Serializar y guardar los catálogos en formato JSON
     var json = JsonSerializer.Serialize(sampleCatalogs, new JsonSerializerOptions { WriteIndented = true });
     File.WriteAllText(catalogsDestination, json);
     Console.WriteLine("Archivo de catálogos creado exitosamente");
@@ -65,7 +76,7 @@ if (!File.Exists(catalogsDestination))
 else
 {
     Console.WriteLine("El archivo de catálogos ya existe");
-    // Verificar que el contenido sea válido
+    // Verificar que el contenido sea válido intentando deserializarlo
     try
     {
         var content = File.ReadAllText(catalogsDestination);
@@ -77,7 +88,7 @@ else
         Console.WriteLine($"Error al leer el archivo de catálogos: {ex.Message}");
         Console.WriteLine("Se reemplazará el archivo con datos válidos");
 
-        // Datos de ejemplo
+        // Datos de ejemplo para reemplazar el archivo corrupto
         var sampleCatalogs = new[]
         {
             new
@@ -93,42 +104,40 @@ else
             }
         };
 
-        // Serializar y guardar
+        // Serializar y guardar los nuevos catálogos
         var json = JsonSerializer.Serialize(sampleCatalogs, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(catalogsDestination, json);
         Console.WriteLine("Archivo de catálogos reemplazado exitosamente");
     }
 }
 
-// Añadir infraestructura
-builder.Services.AddInfrastructure(basePath);
+// Configuración de servicios adicionales
+builder.Services.AddInfrastructure(basePath); // Añadir infraestructura
+builder.Services.AddLogging(configure => configure.AddConsole()); // Configurar logging
+builder.Services.AddMemoryCache(); // Agregar caché en memoria
 
-// Configurar logging
-builder.Services.AddLogging(configure => configure.AddConsole());
-
-builder.Services.AddMemoryCache();
-
+// Construir la aplicación
 var app = builder.Build();
 
-// Construir el proveedor de servicios
-var serviceProvider = app.Services; // Usar app.Services para obtener el proveedor de servicios
+// Obtener el proveedor de servicios
+var serviceProvider = app.Services;
 
-// Inicializar FileDocumentStorage
+// Inicializar el almacenamiento de documentos
 var storage = serviceProvider.GetRequiredService<FileDocumentStorage>();
 await storage.InitAsync();
 
 // Configurar el pipeline de solicitudes HTTP
 if (app.Environment.IsDevelopment())
 {
+    // Habilitar Swagger en desarrollo
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+// Configurar middleware de la aplicación
+app.UseHttpsRedirection(); // Redirección HTTPS
+app.UseAuthorization(); // Autorización
+app.MapControllers(); // Mapeo de controladores
 
 Console.WriteLine("Aplicación configurada correctamente. Iniciando...");
-app.Run();
+app.Run(); // Iniciar la aplicación
