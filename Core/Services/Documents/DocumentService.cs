@@ -11,12 +11,12 @@ namespace Core.Services.Documents
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IDocumentProcessor _documentProcessor;
-        private readonly LoggerServices _loggerService;
+        private readonly ILoggerService _loggerService;
 
         public DocumentService(
             IDocumentRepository documentRepository,
             IDocumentProcessor documentProcessor,
-            LoggerServices loggerService)
+            ILoggerService loggerService)
         {
             _documentRepository = documentRepository;
             _documentProcessor = documentProcessor;

@@ -3,17 +3,29 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
 {
+    /// <summary>
+    /// Controlador que maneja las operaciones relacionadas con documentos
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class DocumentsController : ControllerBase
     {
         private readonly DocumentService _documentService;
 
+        /// <summary>
+        /// Constructor del controlador de documentos
+        /// </summary>
+        /// <param name="documentService">Servicio de documentos a inyectar</param>
         public DocumentsController(DocumentService documentService)
         {
             _documentService = documentService;
         }
 
+        /// <summary>
+        /// Obtiene un documento específico por su identificador
+        /// </summary>
+        /// <param name="id">Identificador único del documento</param>
+        /// <returns>Documento solicitado o NotFound si no existe</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDocument(Guid id)
         {
@@ -34,6 +46,11 @@ namespace WebApi.Controllers
             });
         }
 
+        /// <summary>
+        /// Sube un nuevo documento al sistema
+        /// </summary>
+        /// <param name="file">Archivo a subir</param>
+        /// <returns>Información del documento subido o BadRequest si hay error</returns>
         [HttpPost]
         public async Task<IActionResult> UploadDocument(IFormFile file)
         {

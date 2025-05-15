@@ -1,9 +1,10 @@
 using Infrastructure;
+using Infrastructure.Storage;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+// Agregar servicios al contenedor
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -14,7 +15,7 @@ Console.WriteLine("Configurando aplicación...");
 string basePath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data");
 Console.WriteLine($"Ruta base de datos: {basePath}");
 
-// Ensure catalogs.json exists in the data directory
+// Asegurarse de que catalogs.json exista en el directorio de datos
 string dataDirectory = Path.Combine(basePath, "data");
 Directory.CreateDirectory(dataDirectory);
 string catalogsDestination = Path.Combine(dataDirectory, "catalogs.json");
@@ -36,9 +37,9 @@ if (!File.Exists(catalogsDestination))
             items = new[]
             {
                 new { id = "pdf", name = "PDF", value = "application/pdf" },
-                new { id = "docx", name = "Word Document", value = "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
-                new { id = "xlsx", name = "Excel Document", value = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
-                new { id = "txt", name = "Text File", value = "text/plain" }
+                new { id = "docx", name = "Documento de Word", value = "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+                new { id = "xlsx", name = "Documento de Excel", value = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+                new { id = "txt", name = "Archivo de Texto", value = "text/plain" }
             }
         },
         new
@@ -87,7 +88,7 @@ else
                 items = new[]
                 {
                     new { id = "pdf", name = "PDF", value = "application/pdf" },
-                    new { id = "docx", name = "Word Document", value = "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }
+                    new { id = "docx", name = "Documento de Word", value = "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }
                 }
             }
         };
@@ -102,12 +103,21 @@ else
 // Añadir infraestructura
 builder.Services.AddInfrastructure(basePath);
 
-// Configure logging
+// Configurar logging
 builder.Services.AddLogging(configure => configure.AddConsole());
+
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+// Construir el proveedor de servicios
+var serviceProvider = app.Services; // Usar app.Services para obtener el proveedor de servicios
+
+// Inicializar FileDocumentStorage
+var storage = serviceProvider.GetRequiredService<FileDocumentStorage>();
+await storage.InitAsync();
+
+// Configurar el pipeline de solicitudes HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
