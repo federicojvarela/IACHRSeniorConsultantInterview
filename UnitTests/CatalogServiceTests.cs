@@ -1,4 +1,6 @@
 
+using Core.Services.Catalogs;
+
 namespace UnitTests
 {
     public class CatalogServiceTests

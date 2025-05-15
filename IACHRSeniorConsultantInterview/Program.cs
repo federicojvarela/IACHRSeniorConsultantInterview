@@ -1,10 +1,22 @@
 using Infrastructure;
+using Infrastructure.Storage;
 using System.Text.Json;
+using FluentValidation.AspNetCore;
+using FluentValidation;
+using Core.Validation;
 
+// Crear el builder de la aplicación web
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+// Agregar servicios al contenedor
 builder.Services.AddControllers();
+
+// Configuración de FluentValidation
+builder.Services.AddFluentValidationAutoValidation(); // Validación automática en los endpoints
+builder.Services.AddFluentValidationClientsideAdapters(); // Para MVC y Swagger si usás anotaciones
+builder.Services.AddValidatorsFromAssemblyContaining<UploadDocumentRequestValidator>(); // Registro de tus validadores
+
+// Agregar servicios de API y documentación
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -14,7 +26,7 @@ Console.WriteLine("Configurando aplicación...");
 string basePath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data");
 Console.WriteLine($"Ruta base de datos: {basePath}");
 
-// Ensure catalogs.json exists in the data directory
+// Asegurarse de que catalogs.json exista en el directorio de datos
 string dataDirectory = Path.Combine(basePath, "data");
 Directory.CreateDirectory(dataDirectory);
 string catalogsDestination = Path.Combine(dataDirectory, "catalogs.json");
@@ -36,9 +48,9 @@ if (!File.Exists(catalogsDestination))
             items = new[]
             {
                 new { id = "pdf", name = "PDF", value = "application/pdf" },
-                new { id = "docx", name = "Word Document", value = "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
-                new { id = "xlsx", name = "Excel Document", value = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
-                new { id = "txt", name = "Text File", value = "text/plain" }
+                new { id = "docx", name = "Documento de Word", value = "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+                new { id = "xlsx", name = "Documento de Excel", value = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+                new { id = "txt", name = "Archivo de Texto", value = "text/plain" }
             }
         },
         new
@@ -56,7 +68,7 @@ if (!File.Exists(catalogsDestination))
         }
     };
 
-    // Serializar y guardar
+    // Serializar y guardar los catálogos en formato JSON
     var json = JsonSerializer.Serialize(sampleCatalogs, new JsonSerializerOptions { WriteIndented = true });
     File.WriteAllText(catalogsDestination, json);
     Console.WriteLine("Archivo de catálogos creado exitosamente");
@@ -64,7 +76,7 @@ if (!File.Exists(catalogsDestination))
 else
 {
     Console.WriteLine("El archivo de catálogos ya existe");
-    // Verificar que el contenido sea válido
+    // Verificar que el contenido sea válido intentando deserializarlo
     try
     {
         var content = File.ReadAllText(catalogsDestination);
@@ -76,7 +88,7 @@ else
         Console.WriteLine($"Error al leer el archivo de catálogos: {ex.Message}");
         Console.WriteLine("Se reemplazará el archivo con datos válidos");
 
-        // Datos de ejemplo
+        // Datos de ejemplo para reemplazar el archivo corrupto
         var sampleCatalogs = new[]
         {
             new
@@ -87,38 +99,45 @@ else
                 items = new[]
                 {
                     new { id = "pdf", name = "PDF", value = "application/pdf" },
-                    new { id = "docx", name = "Word Document", value = "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }
+                    new { id = "docx", name = "Documento de Word", value = "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }
                 }
             }
         };
 
-        // Serializar y guardar
+        // Serializar y guardar los nuevos catálogos
         var json = JsonSerializer.Serialize(sampleCatalogs, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(catalogsDestination, json);
         Console.WriteLine("Archivo de catálogos reemplazado exitosamente");
     }
 }
 
-// Añadir infraestructura
-builder.Services.AddInfrastructure(basePath);
+// Configuración de servicios adicionales
+builder.Services.AddInfrastructure(basePath); // Añadir infraestructura
+builder.Services.AddLogging(configure => configure.AddConsole()); // Configurar logging
+builder.Services.AddMemoryCache(); // Agregar caché en memoria
 
-// Configure logging
-builder.Services.AddLogging(configure => configure.AddConsole());
-
+// Construir la aplicación
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+// Obtener el proveedor de servicios
+var serviceProvider = app.Services;
+
+// Inicializar el almacenamiento de documentos
+var storage = serviceProvider.GetRequiredService<FileDocumentStorage>();
+await storage.InitAsync();
+
+// Configurar el pipeline de solicitudes HTTP
 if (app.Environment.IsDevelopment())
 {
+    // Habilitar Swagger en desarrollo
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+// Configurar middleware de la aplicación
+app.UseHttpsRedirection(); // Redirección HTTPS
+app.UseAuthorization(); // Autorización
+app.MapControllers(); // Mapeo de controladores
 
 Console.WriteLine("Aplicación configurada correctamente. Iniciando...");
-app.Run();
+app.Run(); // Iniciar la aplicación
