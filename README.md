@@ -1,71 +1,232 @@
-# Ejercicio de Entrevista para Consultor Senior IACHR
+# Proyecto basado en Clean Architecture
 
-## Introducción
+## Inspiración y objetivos
 
-Este proyecto está diseñado como un ejercicio para evaluar las habilidades de arquitectura, diseño y desarrollo de candidatos a posiciones de consultor senior. El sistema implementa un procesador básico de documentos con catálogos que presenta oportunidades de mejora significativas en términos de arquitectura y rendimiento.
+El proyecto ha sido diseñado siguiendo los principios del patrón Clean Architecture.
 
-## Estructura del Proyecto
+Mi inspiración para implementar Clean Architecture surgió de la necesidad de mejorar la estructura y mantenibilidad del proyecto.
+Noté que, a medida que el sistema crecía, se volvía más difícil de entender, escalar y testear.
+Quería una arquitectura que separara claramente las responsabilidades y permitiera cambiar tecnologías sin afectar la lógica de negocio.
+Además, buscaba una solución que facilitara las pruebas unitarias y me ayudara a mantener un código limpio y desacoplado.
+Por eso decidí adoptar Clean Architecture, porque me permite construir una base sólida, flexible y alineada con buenas prácticas modernas.
 
-El proyecto sigue una arquitectura de capas:
+## Clean Architecture
 
-- **Core**: Contiene las entidades, interfaces y servicios del dominio.
-- **Infrastructure**: Implementa los repositorios y servicios definidos en Core.
-- **WebApi**: Proporciona una API REST para interactuar con el sistema.
+- Independencia de frameworks
+- Testabilidad
+- Facilidad de mantenimiento y escalabilidad
+- Separación clara de responsabilidades
 
-## Desafíos para el Candidato
+### Capas principales:
+1. **Entities (Entidad/Dominio)**: lógica de negocio pura, sin dependencias externas.
+2. **Use Cases / Application**: orquesta flujos de negocio; se comunica con interfaces.
+3. **Interface Adapters**: transforma datos entre capas y controla el flujo de entrada/salida (controladores, DTOs).
+4. **Frameworks & Drivers (Infrastructure)**: frameworks, acceso a datos, sistemas de archivos, servicios externos.
 
-El sistema actual tiene limitaciones importantes que el candidato debe identificar y resolver:
+---
 
-### 1. Procesamiento de Documentos
+## Análisis por capa
 
-Actualmente, el sistema procesa los documentos de manera sincrónica, lo que genera:
-- Bloqueo del hilo de ejecución durante el procesamiento
-- Tiempos de respuesta largos en la API
-- Potenciales problemas de escalabilidad bajo carga
+### 1. 📁 Core
+Ruta: `/Core/`
 
-Se espera que el candidato:
-- **Transforme** el sistema para permitir procesamiento asincrónico
-- **Diseñe** una arquitectura que permita escalabilidad horizontal
-- **Proponga e implemente** patrones arquitectónicos que mejoren la separación de responsabilidades
+**Contenido relevante:**
+- `Entities/Document.cs`, `Catalog.cs`, etc.
+- `Interfaces/`: `IDocumentRepository`, `ICache`, `ILoggerService`, `IDocumentProcessor`, etc.
+- `Enums/ProcessingStatus.cs`
+- `Services/`: `DocumentService`, `CatalogService`
 
-> **Nota:** Valoramos especialmente soluciones que demuestren conocimiento de arquitecturas modernas y desacopladas. Las implementaciones que consideren aspectos como resiliencia, observabilidad y mantenibilidad serán evaluadas positivamente.
+**Fortalezas:**
+- ✅ Entidades modeladas
+- ✅ Interfaces separadas por responsabilidad
+- ✅ Servicios desacoplados de detalles técnicos
+- ✅ Abstracciones para logging, caché y sistema de archivos
 
-### 2. Gestión de Catálogos
+---
 
-Los catálogos son consultados directamente desde el archivo JSON cada vez que se solicitan, causando:
-- Tiempos de respuesta inconsistentes
-- Carga innecesaria del sistema de archivos
-- Uso ineficiente de recursos
+### 2. 📁 Infrastructure
+Ruta: `/Infrastructure/`
 
-Se espera que el candidato:
-- **Diseñe e implemente** una capa de caché eficiente
-- **Defina** estrategias adecuadas de invalidación de caché
-- **Considere** aspectos como la consistencia de datos y la gestión de memoria
+**Contenido relevante:**
+- `Storage/FileDocumentStorage.cs`: implementación de `IDocumentStorage`
+- `Repositories/`: `CatalogRepository`, `DocumentRepository`
+- `Services/`: `FileSystemService.cs`, `MemoryCacheService.cs`, `LoggerServices.cs`
+- `DependencyInjection.cs`
 
-## Criterios de Evaluación
+**Fortalezas:**
+- ✅ Cada implementación corresponde a su interfaz en Core
+- ✅ Servicios están desacoplados
+- ✅ `FileDocumentStorage` usa `IFileSystemService`
+- ✅ Centralización de registros en `DependencyInjection.cs`
 
-Se evaluará principalmente:
+---
 
-- **Diseño arquitectónico**: Capacidad para identificar y aplicar patrones de diseño y arquitectura adecuados para resolver los problemas planteados
-- **Calidad del código**: Limpieza, mantenibilidad, seguimiento de principios SOLID
-- **Visión técnica**: Capacidad para ver más allá de la solución inmediata y proponer mejoras que añadan valor a largo plazo
-- **Toma de decisiones**: Justificación clara de las decisiones técnicas tomadas y consideración de alternativas
-- **Conocimiento de tecnologías modernas**: Uso apropiado de características avanzadas del lenguaje y frameworks
+### 3. 📁 Web/API
+Ruta: `/IACHRSeniorConsultantInterview/`
 
-No buscamos simplemente que el código "funcione", sino que demuestre un pensamiento arquitectónico maduro que anticipe futuras necesidades y cambios.
+**Contenido relevante:**
+- `Controllers/CatalogsController.cs`, `DocumentsController.cs`
+- `Program.cs`, `appsettings.json`
 
-## Cómo Ejecutar el Proyecto
+**Fortalezas:**
+- ✅ Controladores livianos
+- ✅ `Program.cs` estructurado
+- ✅ Uso de `AddInfrastructure(basePath)`
 
-1. Clonar el repositorio
-2. Restaurar las dependencias
-3. Ejecutar el proyecto WebApi
-4. Acceder a Swagger para probar la API: `https://localhost:5001/swagger`
+---
 
-## Entregables Esperados
+### 4. 📁 UnitTests
+Ruta: `/UnitTests/`
 
-1. Código fuente con las mejoras implementadas
-2. Documentación breve que explique:
-   - Patrones arquitectónicos aplicados
-   - Justificación de las decisiones técnicas
-   - Consideraciones de escalabilidad y mantenibilidad
-   - Posibles mejoras adicionales que implementaría con más tiempo
+**Contenido relevante:**
+- `CatalogServiceTests.cs`, `DocumentProcessorServiceTests.cs`, etc.
+
+---
+
+## 🔄 Manejo de caché
+
+- `ICache` definido en Core
+- `MemoryCacheService` implementa con `IMemoryCache`
+- `FileDocumentStorage` usa caché para evitar lecturas repetidas
+- Claves bien organizadas (`document_{id}`)
+
+---
+
+
+# Refactorización según Clean Architecture y SOLID
+
+## 📁 Clase `FileDocumentStorage`
+
+### 1. Principio de Responsabilidad Única (SRP)
+
+**Análisis:**
+
+Originalmente, `FileDocumentStorage` mezclaba responsabilidades como lectura de archivos, almacenamiento de documentos y gestión de caché.
+
+**Estado actual:**
+
+Se mantuvo como clase única, pero se ha desacoplado usando interfaces:
+- `ICache` para la gestión de caché.
+- `IFileSystemService` para operaciones de archivo.
+- `ILoggerService` para trazabilidad.
+
+Esto permite que la clase sea testeable, flexible y que cada responsabilidad sea inyectada y aislada.
+
+---
+
+### 2. Principio Abierto/Cerrado (OCP)
+
+**Análisis:**
+
+La clase ahora depende exclusivamente de interfaces (`IDocumentStorage`, `ICache`, etc.), lo que permite introducir nuevas implementaciones como `DatabaseDocumentStorage` o `RedisCacheService` sin modificar la lógica de `FileDocumentStorage`.
+
+---
+
+### 3. Principio de Sustitución de Liskov (LSP)
+
+**Análisis:**
+
+Las clases concretas (`MemoryCacheService`, `FileSystemService`, etc.) respetan los contratos definidos por sus interfaces. Se pueden sustituir sin afectar el funcionamiento general de la aplicación.
+
+---
+
+### 4. Principio de Inversión de Dependencias (DIP)
+
+**Análisis:**
+
+`FileDocumentStorage` ya no depende directamente de `File`, `Directory` ni de una clase de caché concreta. Ahora todas sus dependencias (`ICache`, `ILoggerService`, `IFileSystemService`) son inyectadas desde el exterior.
+
+---
+
+## 📁 Clase `CatalogsController`
+
+### 1. Uso de `CatalogService` en lugar de `ICatalogRepository`
+
+**Estado actual:**
+
+`CatalogsController` ahora depende de `CatalogService`, el cual encapsula la lógica de negocio. Este servicio delega al repositorio (`ICatalogRepository`) cuando necesita acceder a los datos.
+
+---
+
+### 2. Principio de Responsabilidad Única (SRP)
+
+**Análisis:**
+
+Cada clase cumple una función clara:
+- `CatalogsController` responde a peticiones HTTP.
+- `CatalogService` orquesta lógica de negocio.
+- `CatalogRepository` accede a los datos de los catálogos.
+
+---
+
+### 3. Uso de DTO (`CatalogDto`)
+
+**Estado actual:**
+
+Se usa `CatalogDto` para encapsular los datos de respuesta. Esto permite desacoplar el dominio de la presentación y adaptar la salida a las necesidades del cliente.
+
+---
+
+## 📁 Interfaces y Servicios
+
+### Interfaces implementadas:
+
+- `IDocumentStorage`: define operaciones de almacenamiento de documentos.
+- `ICatalogRepository`: define cómo acceder a catálogos.
+- `ICache`: abstracción de la lógica de caché.
+- `ILoggerService`: logging desacoplado.
+- `IFileSystemService`: operaciones de archivos sin acoplarse a `System.IO`.
+
+### Servicios implementados:
+
+- `MemoryCacheService`: implementa `ICache` usando `IMemoryCache`.
+- `LoggerServices`: implementación básica de `ILoggerService`.
+- `FileSystemService`: implementa acceso a disco de forma desacoplada.
+
+---
+
+## ✅ Conclusión
+
+El proyecto ha sido alineado con los principios de Clean Architecture. Ahora cuenta con:
+
+- Una separación clara de responsabilidades.
+- Inversión de dependencias en todas las capas.
+- Interfaces desacopladas que permiten pruebas y cambios futuros.
+- Servicios inyectables y reemplazables.
+
+---
+
+# Flujo completo para `GetCatalog(string id)`
+
+### Paso a paso:
+
+1. Llamada HTTP → `/api/catalogs/{id}` → `CatalogsController.GetCatalog(string id)`
+2. Se invoca `CatalogService.GetCatalogByIdAsync(id)`
+3. Busca el catálogo en la caché (`ICache`)
+4. Si no está, accede al repositorio (`CatalogRepository`)
+5. Guarda en caché si se encontró
+6. Devuelve un DTO al cliente
+
+**Respuesta final:**
+```json
+{
+  "id": "document-types",
+  "name": "Tipos de Documento",
+  "description": "Catálogo de tipos de documentos soportados por el sistema",
+  "itemCount": 4
+}
+```
+
+---
+
+## Tecnologías y patrones involucrados
+
+| Componente              | Rol                                                   |
+|-------------------------|--------------------------------------------------------|
+| ASP.NET Core            | Enrutamiento y controladores HTTP                      |
+| `CatalogService`        | Orquestación y lógica de negocio                       |
+| `ICache` (`MemoryCacheService`) | Optimización de acceso a datos                          |
+| `ICatalogRepository`    | Acceso a catálogos desde almacenamiento en JSON        |
+| DTOs                    | Separación entre dominio y presentación                |
+| Dependency Injection    | Inyección de servicios como `ICache`, `ILogger`, etc.  |
+
