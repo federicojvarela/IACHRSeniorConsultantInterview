@@ -7,12 +7,21 @@ using System.Threading.Tasks;
 
 namespace Core.Services.Documents
 {
+    /// <summary>
+    /// Servicio de negocio para la gestión y procesamiento de documentos.
+    /// </summary>
     public class DocumentService
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IDocumentProcessor _documentProcessor;
         private readonly ILoggerService _loggerService;
 
+        /// <summary>
+        /// Inicializa una nueva instancia del servicio de documentos.
+        /// </summary>
+        /// <param name="documentRepository">Repositorio de documentos.</param>
+        /// <param name="documentProcessor">Procesador de documentos.</param>
+        /// <param name="loggerService">Servicio de logging.</param>
         public DocumentService(
             IDocumentRepository documentRepository,
             IDocumentProcessor documentProcessor,
@@ -23,6 +32,13 @@ namespace Core.Services.Documents
             _loggerService = loggerService;
         }
 
+        /// <summary>
+        /// Sube un nuevo documento al sistema y dispara su procesamiento.
+        /// </summary>
+        /// <param name="fileName">Nombre del archivo.</param>
+        /// <param name="contentType">Tipo de contenido MIME.</param>
+        /// <param name="content">Contenido binario del archivo.</param>
+        /// <returns>El documento guardado.</returns>
         public async Task<Document> UploadDocumentAsync(string fileName, string contentType, byte[] content)
         {
             _loggerService.LogInformation($"Subiendo documento: {fileName}");
@@ -52,6 +68,10 @@ namespace Core.Services.Documents
             return savedDocument;
         }
 
+        /// <summary>
+        /// Procesa un documento de manera interna, actualizando su estado y resultado.
+        /// </summary>
+        /// <param name="documentId">Identificador único del documento a procesar.</param>
         private async Task ProcessDocumentAsync(Guid documentId)
         {
             try
@@ -105,6 +125,11 @@ namespace Core.Services.Documents
             }
         }
 
+        /// <summary>
+        /// Obtiene un documento por su identificador único.
+        /// </summary>
+        /// <param name="id">Identificador único del documento.</param>
+        /// <returns>El documento encontrado o null si no existe.</returns>
         public async Task<Document> GetDocument(Guid id)
         {
             return await _documentRepository.GetByIdAsync(id);

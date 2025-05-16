@@ -1,5 +1,4 @@
 ﻿using Core.Interfaces;
-using Core.Services.Catalogs;
 using Core.Services.Documents;
 using Infrastructure.Storage;
 using Infrastructure.Repositories;
@@ -9,16 +8,18 @@ using Infrastructure.Services;
 namespace Infrastructure
 {
     /// <summary>
-    /// Clase estática para configurar la inyección de dependencias de la capa de infraestructura
+    /// Clase estática para configurar la inyección de dependencias de la capa de infraestructura.
+    /// Proporciona métodos para registrar servicios, repositorios y utilidades en el contenedor DI.
     /// </summary>
     public static class DependencyInjection
     {
         /// <summary>
-        /// Configura los servicios de infraestructura en el contenedor de dependencias
+        /// Configura los servicios de infraestructura en el contenedor de dependencias.
+        /// Incluye almacenamiento, logging, sistema de archivos, repositorios y servicios de negocio.
         /// </summary>
-        /// <param name="services">Colección de servicios a configurar</param>
-        /// <param name="basePath">Ruta base para almacenamiento de archivos</param>
-        /// <returns>La colección de servicios configurada</returns>
+        /// <param name="services">Colección de servicios a configurar.</param>
+        /// <param name="basePath">Ruta base para almacenamiento de archivos.</param>
+        /// <returns>La colección de servicios configurada.</returns>
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, string basePath)
         {
             // Verificar y crear directorios necesarios para la aplicación
@@ -60,7 +61,6 @@ namespace Infrastructure
 
             // Registro de servicios de negocio
             services.AddScoped<DocumentService>();  // Servicio para gestión de documentos
-            services.AddScoped<CatalogService>();   // Servicio para gestión de catálogos
 
             Console.WriteLine("Infraestructura configurada correctamente");
             return services;

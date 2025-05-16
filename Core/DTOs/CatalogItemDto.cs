@@ -1,24 +1,43 @@
 namespace Core.DTOs
 {
     /// <summary>
-    /// Representa un Objeto de Transferencia de Datos (DTO) para un elemento de catálogo.
+    /// DTO que representa un elemento individual dentro de un catálogo.
     /// </summary>
     public class CatalogItemDto
     {
         /// <summary>
-        /// Obtiene o establece el identificador único del elemento.
+        /// Identificador único del elemento del catálogo.
         /// </summary>
         public string Id { get; set; }
 
         /// <summary>
-        /// Obtiene o establece el nombre descriptivo del elemento.
+        /// Nombre descriptivo del elemento.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Obtiene o establece el valor asociado al elemento del catálogo.
-        /// Por ejemplo, para un tipo de documento podría ser el content-type.
+        /// Valor asociado al elemento del catálogo (por ejemplo, content-type).
         /// </summary>
         public string Value { get; set; }
+
+        /// <summary>
+        /// Nombre del archivo asociado al elemento (si aplica).
+        /// </summary>
+        public string FileName { get; set; }
+
+        /// <summary>
+        /// Ruta del archivo asociado al elemento (si aplica).
+        /// </summary>
+        public string FilePath { get; set; }
+
+        /// <summary>
+        /// Tamaño del archivo asociado al elemento (en bytes).
+        /// </summary>
+        public long Size { get; set; }
+
+        /// <summary>
+        /// Fecha de última modificación del archivo asociado al elemento.
+        /// </summary>
+        public DateTime LastModified { get; set; }
     }
 }

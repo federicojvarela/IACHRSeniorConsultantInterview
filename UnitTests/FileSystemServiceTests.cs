@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Infrastructure.Tests
+namespace UnitTests.Services
 {
     /// <summary>
     /// Pruebas unitarias para el servicio del sistema de archivos
@@ -27,7 +27,7 @@ namespace Infrastructure.Tests
         /// Prueba que verifica que FileExists devuelve verdadero cuando el archivo existe
         /// </summary>
         [Fact]
-        public void FileExists_ShouldReturnTrue_WhenFileExists()
+        public void FileExistsShouldReturnTrueWhenFileExists()
         {
             // Preparación
             var filePath = Path.Combine(_testDirectory, "testfile.txt");
@@ -44,7 +44,7 @@ namespace Infrastructure.Tests
         /// Prueba que verifica que FileExists devuelve falso cuando el archivo no existe
         /// </summary>
         [Fact]
-        public void FileExists_ShouldReturnFalse_WhenFileDoesNotExist()
+        public void FileExistsShouldReturnFalseWhenFileDoesNotExist()
         {
             // Preparación
             var filePath = Path.Combine(_testDirectory, "nonexistentfile.txt");
@@ -60,7 +60,7 @@ namespace Infrastructure.Tests
         /// Prueba que verifica que ReadFileAsync devuelve el contenido correcto cuando el archivo existe
         /// </summary>
         [Fact]
-        public async Task ReadFileAsync_ShouldReturnFileContent_WhenFileExists()
+        public async Task ReadFileAsyncShouldReturnFileContentWhenFileExists()
         {
             // Preparación
             var filePath = Path.Combine(_testDirectory, "testfile.txt");
@@ -78,7 +78,7 @@ namespace Infrastructure.Tests
         /// Prueba que verifica que WriteFileAsync crea correctamente un archivo con contenido
         /// </summary>
         [Fact]
-        public async Task WriteFileAsync_ShouldCreateFileWithContent()
+        public async Task WriteFileAsyncShouldCreateFileWithContent()
         {
             // Preparación
             var filePath = Path.Combine(_testDirectory, "writefile.txt");
@@ -90,6 +90,41 @@ namespace Infrastructure.Tests
             // Verificación
             Assert.True(File.Exists(filePath));
             Assert.Equal(content, await _fileSystemService.ReadFileAsync(filePath));
+        }
+
+        /// <summary>
+        /// Prueba que verifica que ReadFileAsync lanza una excepción cuando el archivo no existe
+        /// </summary>
+        [Fact]
+        public async Task ReadFileAsyncShouldThrowWhenFileDoesNotExist()
+        {
+            var filePath = Path.Combine(_testDirectory, "doesnotexist.txt");
+            await Assert.ThrowsAsync<FileNotFoundException>(() => _fileSystemService.ReadFileAsync(filePath));
+        }
+
+        /// <summary>
+        /// Prueba que verifica que WriteFileAsync sobrescribe correctamente un archivo existente
+        /// </summary>
+        [Fact]
+        public async Task WriteFileAsyncShouldOverwriteExistingFile()
+        {
+            var filePath = Path.Combine(_testDirectory, "overwrite.txt");
+            await _fileSystemService.WriteFileAsync(filePath, "First");
+            await _fileSystemService.WriteFileAsync(filePath, "Second");
+            var content = await _fileSystemService.ReadFileAsync(filePath);
+            Assert.Equal("Second", content);
+        }
+
+        /// <summary>
+        /// Prueba que verifica que EnsureDirectoryExists crea correctamente un directorio si falta
+        /// </summary>
+        [Fact]
+        public void EnsureDirectoryExistsShouldCreateDirectoryIfMissing()
+        {
+            var dir = Path.Combine(_testDirectory, "newdir");
+            if (Directory.Exists(dir)) Directory.Delete(dir, true);
+            _fileSystemService.EnsureDirectoryExists(dir);
+            Assert.True(Directory.Exists(dir));
         }
     }
 }
