@@ -29,7 +29,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public async Task UploadDocument_ShouldSaveAndProcessDocument()
+        public async Task UploadDocumentShouldSaveAndProcessDocument()
         {
             // Arrange
             var fileName = "test.pdf";
@@ -70,7 +70,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public async Task GetDocument_ShouldReturnDocumentFromRepository()
+        public async Task GetDocumentShouldReturnDocumentFromRepository()
         {
             // Arrange
             var docId = Guid.NewGuid();

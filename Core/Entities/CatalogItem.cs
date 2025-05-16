@@ -3,25 +3,24 @@
 namespace Core.Entities
 {
     /// <summary>
-    /// Representa un elemento individual dentro de un catálogo
+    /// Entidad que representa un elemento individual dentro de un catálogo.
     /// </summary>
     public class CatalogItem
     {
         /// <summary>
-        /// Identificador único del elemento del catálogo
+        /// Identificador único del elemento del catálogo.
         /// </summary>
         [JsonPropertyName("id")]
         public string Id { get; set; }
 
         /// <summary>
-        /// Nombre descriptivo del elemento del catálogo
+        /// Nombre descriptivo del elemento del catálogo.
         /// </summary>
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
         /// <summary>
-        /// Valor asociado al elemento del catálogo.
-        /// Por ejemplo, para un tipo de documento podría ser el content-type.
+        /// Valor asociado al elemento del catálogo (por ejemplo, content-type).
         /// </summary>
         [JsonPropertyName("value")]
         public string Value { get; set; }

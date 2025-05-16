@@ -4,7 +4,7 @@ using Core.DTOs;
 namespace WebApi.Controllers
 {
     /// <summary>
-    /// Controlador que maneja las operaciones relacionadas con los catálogos
+    /// Controlador para operaciones relacionadas con catálogos.
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
@@ -14,18 +14,18 @@ namespace WebApi.Controllers
         private readonly ICatalogRepository _catalogService;
 
         /// <summary>
-        /// Constructor del controlador de catálogos
+        /// Inicializa una nueva instancia del controlador de catálogos.
         /// </summary>
-        /// <param name="catalogService">Servicio de catálogos a inyectar</param>
+        /// <param name="catalogService">Servicio de catálogos a inyectar.</param>
         public CatalogsController(ICatalogRepository catalogService)
         {
             _catalogService = catalogService;
         }
 
         /// <summary>
-        /// Obtiene todos los catálogos disponibles
+        /// Obtiene todos los catálogos disponibles.
         /// </summary>
-        /// <returns>Lista de catálogos en formato DTO</returns>
+        /// <returns>Lista de catálogos en formato DTO.</returns>
         [HttpGet]
         public async Task<IActionResult> GetAllCatalogs()
         {
@@ -44,10 +44,10 @@ namespace WebApi.Controllers
         }
 
         /// <summary>
-        /// Obtiene un catálogo específico por su identificador
+        /// Obtiene un catálogo específico por su identificador.
         /// </summary>
-        /// <param name="id">Identificador único del catálogo</param>
-        /// <returns>Catálogo solicitado en formato DTO</returns>
+        /// <param name="id">Identificador único del catálogo.</param>
+        /// <returns>Catálogo solicitado en formato DTO.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCatalog(string id)
         {
@@ -71,11 +71,11 @@ namespace WebApi.Controllers
         }
 
         /// <summary>
-        /// Obtiene un elemento específico de un catálogo
+        /// Obtiene un elemento específico de un catálogo.
         /// </summary>
-        /// <param name="catalogId">Identificador del catálogo</param>
-        /// <param name="itemId">Identificador del elemento</param>
-        /// <returns>Elemento del catálogo en formato DTO</returns>
+        /// <param name="catalogId">Identificador del catálogo.</param>
+        /// <param name="itemId">Identificador del elemento.</param>
+        /// <returns>Elemento del catálogo en formato DTO.</returns>
         [HttpGet("{catalogId}/items/{itemId}")]
         public async Task<IActionResult> GetCatalogItem(string catalogId, string itemId)
         {

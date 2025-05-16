@@ -1,14 +1,30 @@
+# Reseña de mejoras en el manejo de caché
+
+Decidí mejorar el manejo de caché del sistema porque identifiqué problemas de funcionamiento, acoplamiento innecesario y bajo rendimiento.
+
+Antes, el servicio de caché estaba mal configurado y era difícil de mantener. Lo reescribí para que sea más limpio, reutilizable y fácil de integrar en distintos puntos del sistema.
+
+También actualicé el almacenamiento de documentos para que trabaje de forma más eficiente y completamente asincrónica, lo que permite un mejor rendimiento general.
+
+Incorporé además una nueva caché especializada para el archivo `catalogs.json`, que mantiene los datos en memoria y se actualiza automáticamente si el archivo cambia.
+
+Esto evita lecturas repetidas del disco y mejora significativamente los tiempos de respuesta.
+
+La motivación principal fue lograr un sistema más rápido, ordenado y fácil de escalar.
+
+Separar la lógica de la caché general de la caché específica me permite controlar mejor cada escenario.
+
+Esto también mejora la experiencia de desarrollo y reduce posibles errores en el futuro.
+
+
+
 # Proyecto basado en Clean Architecture
 
 ## Inspiración y objetivos
 
 El proyecto ha sido diseñado siguiendo los principios del patrón Clean Architecture.
 
-Mi inspiración para implementar Clean Architecture surgió de la necesidad de mejorar la estructura y mantenibilidad del proyecto.
-Noté que, a medida que el sistema crecía, se volvía más difícil de entender, escalar y testear.
-Quería una arquitectura que separara claramente las responsabilidades y permitiera cambiar tecnologías sin afectar la lógica de negocio.
-Además, buscaba una solución que facilitara las pruebas unitarias y me ayudara a mantener un código limpio y desacoplado.
-Por eso decidí adoptar Clean Architecture, porque me permite construir una base sólida, flexible y alineada con buenas prácticas modernas.
+Mi motivación para adoptar Clean Architecture fue mejorar la estructura, la mantenibilidad y la escalabilidad del sistema. A medida que el proyecto creció, se volvió más difícil de entender y testear. Quise una arquitectura que separara las responsabilidades de forma clara, facilitara los cambios tecnológicos sin impactar la lógica de negocio y permitiera pruebas unitarias simples. Esta arquitectura me permite una base sólida y moderna.
 
 ## Clean Architecture
 
@@ -18,10 +34,10 @@ Por eso decidí adoptar Clean Architecture, porque me permite construir una base
 - Separación clara de responsabilidades
 
 ### Capas principales:
-1. **Entities (Entidad/Dominio)**: lógica de negocio pura, sin dependencias externas.
-2. **Use Cases / Application**: orquesta flujos de negocio; se comunica con interfaces.
-3. **Interface Adapters**: transforma datos entre capas y controla el flujo de entrada/salida (controladores, DTOs).
-4. **Frameworks & Drivers (Infrastructure)**: frameworks, acceso a datos, sistemas de archivos, servicios externos.
+1. **Entities (Dominio)**: Lógica de negocio pura, sin dependencias.
+2. **Use Cases / Application**: Orquestación de flujos de negocio.
+3. **Interface Adapters**: Transformación de datos entre capas (DTOs, controladores).
+4. **Frameworks & Drivers (Infrastructure)**: Acceso a datos, archivos, frameworks, servicios externos.
 
 ---
 
@@ -32,15 +48,15 @@ Ruta: `/Core/`
 
 **Contenido relevante:**
 - `Entities/Document.cs`, `Catalog.cs`, etc.
-- `Interfaces/`: `IDocumentRepository`, `ICache`, `ILoggerService`, `IDocumentProcessor`, etc.
+- `Interfaces/`: `IDocumentRepository`, `ICache`, `ILoggerService`, etc.
 - `Enums/ProcessingStatus.cs`
 - `Services/`: `DocumentService`, `CatalogService`
 
 **Fortalezas:**
-- ✅ Entidades modeladas
-- ✅ Interfaces separadas por responsabilidad
-- ✅ Servicios desacoplados de detalles técnicos
-- ✅ Abstracciones para logging, caché y sistema de archivos
+- Entidades bien modeladas
+- Interfaces desacopladas
+- Servicios reutilizables y testables
+- Abstracciones para caché, logging y sistema de archivos
 
 ---
 
@@ -48,16 +64,16 @@ Ruta: `/Core/`
 Ruta: `/Infrastructure/`
 
 **Contenido relevante:**
-- `Storage/FileDocumentStorage.cs`: implementación de `IDocumentStorage`
+- `Storage/FileDocumentStorage.cs`: almacenamiento de documentos
+- `Services/`: `FileSystemService.cs`, `MemoryCacheService.cs`, `FileCatalogCache.cs`, `LoggerServices.cs`
 - `Repositories/`: `CatalogRepository`, `DocumentRepository`
-- `Services/`: `FileSystemService.cs`, `MemoryCacheService.cs`, `LoggerServices.cs`
 - `DependencyInjection.cs`
 
 **Fortalezas:**
-- ✅ Cada implementación corresponde a su interfaz en Core
-- ✅ Servicios están desacoplados
-- ✅ `FileDocumentStorage` usa `IFileSystemService`
-- ✅ Centralización de registros en `DependencyInjection.cs`
+- Implementaciones concretas para cada interfaz de Core
+- `FileDocumentStorage` ahora usa `ICache` correctamente con métodos async genéricos
+- `MemoryCacheService` rediseñado para ser más limpio, seguro y compatible con DI
+- Introducción de `FileCatalogCache`, una caché especializada para `catalogs.json`
 
 ---
 
@@ -65,13 +81,13 @@ Ruta: `/Infrastructure/`
 Ruta: `/IACHRSeniorConsultantInterview/`
 
 **Contenido relevante:**
-- `Controllers/CatalogsController.cs`, `DocumentsController.cs`
-- `Program.cs`, `appsettings.json`
+- `Controllers/CatalogsController.cs`, `CachedCatalogController.cs`, `DocumentsController.cs`
+- `Program.cs`
 
 **Fortalezas:**
-- ✅ Controladores livianos
-- ✅ `Program.cs` estructurado
-- ✅ Uso de `AddInfrastructure(basePath)`
+- Controladores simples y bien enfocados
+- Uso de servicios y no de repositorios directamente
+- `CachedCatalogController` expone el contenido de `catalogs.json` cacheado y permite forzar su recarga
 
 ---
 
@@ -80,153 +96,29 @@ Ruta: `/UnitTests/`
 
 **Contenido relevante:**
 - `CatalogServiceTests.cs`, `DocumentProcessorServiceTests.cs`, etc.
+- `FileDocumentStorageTests.cs`, `FileCatalogCacheTests.cs`, `MemoryCacheServiceTests.cs`
+
+**Fortalezas:**
+- Cobertura para lógica de negocio y manejo de caché
+- Tests para escenarios reales y casos borde
 
 ---
 
-## 🔄 Manejo de caché
+## 🔄 Manejo de caché actualizado
 
-- `ICache` definido en Core
-- `MemoryCacheService` implementa con `IMemoryCache`
-- `FileDocumentStorage` usa caché para evitar lecturas repetidas
-- Claves bien organizadas (`document_{id}`)
+### 🔹 `MemoryCacheService`
+- Antes: usaba `ICache<object>`, con errores de compilación y operaciones riesgosas.
+- Ahora: implementa `ICache` (no genérica) con métodos genéricos (`GetAsync<T>`, `SetAsync<T>`), lo que mejora seguridad de tipos y compatibilidad con DI.
 
----
+### 🔹 `FileDocumentStorage`
+- Antes: cacheaba usando `object`, con castings inseguros.
+- Ahora: accede al caché de forma tipada y completamente asincrónica.
+- Se agregaron métodos como `InvalidateCacheAsync` y `InvalidateAllCacheAsync` para mejorar el control.
 
-
-# Refactorización según Clean Architecture y SOLID
-
-## 📁 Clase `FileDocumentStorage`
-
-### 1. Principio de Responsabilidad Única (SRP)
-
-**Análisis:**
-
-Originalmente, `FileDocumentStorage` mezclaba responsabilidades como lectura de archivos, almacenamiento de documentos y gestión de caché.
-
-**Estado actual:**
-
-Se mantuvo como clase única, pero se ha desacoplado usando interfaces:
-- `ICache` para la gestión de caché.
-- `IFileSystemService` para operaciones de archivo.
-- `ILoggerService` para trazabilidad.
-
-Esto permite que la clase sea testeable, flexible y que cada responsabilidad sea inyectada y aislada.
+### 🔹 `FileCatalogCache`
+- Nueva caché especializada para `catalogs.json`
+- Lee el archivo una vez y guarda los datos en memoria (TTL)
+- Usa `FileSystemWatcher` para invalidar automáticamente la caché si el archivo cambia
+- Expuesta por el controlador `CachedCatalogController`
 
 ---
-
-### 2. Principio Abierto/Cerrado (OCP)
-
-**Análisis:**
-
-La clase ahora depende exclusivamente de interfaces (`IDocumentStorage`, `ICache`, etc.), lo que permite introducir nuevas implementaciones como `DatabaseDocumentStorage` o `RedisCacheService` sin modificar la lógica de `FileDocumentStorage`.
-
----
-
-### 3. Principio de Sustitución de Liskov (LSP)
-
-**Análisis:**
-
-Las clases concretas (`MemoryCacheService`, `FileSystemService`, etc.) respetan los contratos definidos por sus interfaces. Se pueden sustituir sin afectar el funcionamiento general de la aplicación.
-
----
-
-### 4. Principio de Inversión de Dependencias (DIP)
-
-**Análisis:**
-
-`FileDocumentStorage` ya no depende directamente de `File`, `Directory` ni de una clase de caché concreta. Ahora todas sus dependencias (`ICache`, `ILoggerService`, `IFileSystemService`) son inyectadas desde el exterior.
-
----
-
-## 📁 Clase `CatalogsController`
-
-### 1. Uso de `CatalogService` en lugar de `ICatalogRepository`
-
-**Estado actual:**
-
-`CatalogsController` ahora depende de `CatalogService`, el cual encapsula la lógica de negocio. Este servicio delega al repositorio (`ICatalogRepository`) cuando necesita acceder a los datos.
-
----
-
-### 2. Principio de Responsabilidad Única (SRP)
-
-**Análisis:**
-
-Cada clase cumple una función clara:
-- `CatalogsController` responde a peticiones HTTP.
-- `CatalogService` orquesta lógica de negocio.
-- `CatalogRepository` accede a los datos de los catálogos.
-
----
-
-### 3. Uso de DTO (`CatalogDto`)
-
-**Estado actual:**
-
-Se usa `CatalogDto` para encapsular los datos de respuesta. Esto permite desacoplar el dominio de la presentación y adaptar la salida a las necesidades del cliente.
-
----
-
-## 📁 Interfaces y Servicios
-
-### Interfaces implementadas:
-
-- `IDocumentStorage`: define operaciones de almacenamiento de documentos.
-- `ICatalogRepository`: define cómo acceder a catálogos.
-- `ICache`: abstracción de la lógica de caché.
-- `ILoggerService`: logging desacoplado.
-- `IFileSystemService`: operaciones de archivos sin acoplarse a `System.IO`.
-
-### Servicios implementados:
-
-- `MemoryCacheService`: implementa `ICache` usando `IMemoryCache`.
-- `LoggerServices`: implementación básica de `ILoggerService`.
-- `FileSystemService`: implementa acceso a disco de forma desacoplada.
-
----
-
-## ✅ Conclusión
-
-El proyecto ha sido alineado con los principios de Clean Architecture. Ahora cuenta con:
-
-- Una separación clara de responsabilidades.
-- Inversión de dependencias en todas las capas.
-- Interfaces desacopladas que permiten pruebas y cambios futuros.
-- Servicios inyectables y reemplazables.
-
----
-
-# Flujo completo para `GetCatalog(string id)`
-
-### Paso a paso:
-
-1. Llamada HTTP → `/api/catalogs/{id}` → `CatalogsController.GetCatalog(string id)`
-2. Se invoca `CatalogService.GetCatalogByIdAsync(id)`
-3. Busca el catálogo en la caché (`ICache`)
-4. Si no está, accede al repositorio (`CatalogRepository`)
-5. Guarda en caché si se encontró
-6. Devuelve un DTO al cliente
-
-**Respuesta final:**
-```json
-{
-  "id": "document-types",
-  "name": "Tipos de Documento",
-  "description": "Catálogo de tipos de documentos soportados por el sistema",
-  "itemCount": 4
-}
-```
-
----
-
-## Tecnologías y patrones involucrados
-
-| Componente              | Rol                                                   |
-|-------------------------|--------------------------------------------------------|
-| ASP.NET Core            | Enrutamiento y controladores HTTP                      |
-| `CatalogService`        | Orquestación y lógica de negocio                       |
-| `ICache` (`MemoryCacheService`) | Optimización de acceso a datos                          |
-| `ICatalogRepository`    | Acceso a catálogos desde almacenamiento en JSON        |
-| DTOs                    | Separación entre dominio y presentación                |
-| Dependency Injection    | Inyección de servicios como `ICache`, `ILogger`, etc.  |
-

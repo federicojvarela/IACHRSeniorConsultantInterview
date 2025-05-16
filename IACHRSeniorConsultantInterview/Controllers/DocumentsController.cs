@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApi.Controllers
 {
     /// <summary>
-    /// Controlador que maneja las operaciones relacionadas con documentos
+    /// Controlador para operaciones relacionadas con documentos.
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
@@ -13,19 +13,19 @@ namespace WebApi.Controllers
         private readonly DocumentService _documentService;
 
         /// <summary>
-        /// Constructor del controlador de documentos
+        /// Inicializa una nueva instancia del controlador de documentos.
         /// </summary>
-        /// <param name="documentService">Servicio de documentos a inyectar</param>
+        /// <param name="documentService">Servicio de documentos a inyectar.</param>
         public DocumentsController(DocumentService documentService)
         {
             _documentService = documentService;
         }
 
         /// <summary>
-        /// Obtiene un documento específico por su identificador
+        /// Obtiene un documento específico por su identificador.
         /// </summary>
-        /// <param name="id">Identificador único del documento</param>
-        /// <returns>Documento solicitado o NotFound si no existe</returns>
+        /// <param name="id">Identificador único del documento.</param>
+        /// <returns>Documento solicitado o NotFound si no existe.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDocument(Guid id)
         {
@@ -34,7 +34,6 @@ namespace WebApi.Controllers
             {
                 return NotFound();
             }
-
             return Ok(new
             {
                 document.Id,
@@ -47,10 +46,10 @@ namespace WebApi.Controllers
         }
 
         /// <summary>
-        /// Sube un nuevo documento al sistema
+        /// Sube un nuevo documento al sistema.
         /// </summary>
-        /// <param name="file">Archivo a subir</param>
-        /// <returns>Información del documento subido o BadRequest si hay error</returns>
+        /// <param name="file">Archivo a subir.</param>
+        /// <returns>Información del documento subido o BadRequest si hay error.</returns>
         [HttpPost]
         public async Task<IActionResult> UploadDocument(IFormFile file)
         {

@@ -1,14 +1,12 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
 using System.Text.Json;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Storage
 {
     /// <summary>
-    /// Implementación de almacenamiento de documentos usando el sistema de archivos
+    /// Implementación de almacenamiento de documentos usando el sistema de archivos y caché.
+    /// Permite operaciones CRUD y mantiene los datos sincronizados en disco y memoria.
     /// </summary>
     public class FileDocumentStorage : IDocumentStorage
     {
@@ -19,12 +17,12 @@ namespace Infrastructure.Storage
         private Dictionary<Guid, Document> _documents;
 
         /// <summary>
-        /// Constructor de la clase FileDocumentStorage
+        /// Inicializa una nueva instancia de FileDocumentStorage.
         /// </summary>
-        /// <param name="cache">Servicio de caché</param>
-        /// <param name="logger">Servicio de logging</param>
-        /// <param name="fileSystem">Servicio del sistema de archivos</param>
-        /// <param name="basePath">Ruta base donde se almacenarán los documentos</param>
+        /// <param name="cache">Servicio de caché.</param>
+        /// <param name="logger">Servicio de logging.</param>
+        /// <param name="fileSystem">Servicio del sistema de archivos.</param>
+        /// <param name="basePath">Ruta base donde se almacenarán los documentos.</param>
         public FileDocumentStorage(ICache cache, ILoggerService logger, IFileSystemService fileSystem, string basePath)
         {
             _cache = cache;
@@ -39,7 +37,7 @@ namespace Infrastructure.Storage
         }
 
         /// <summary>
-        /// Inicializa el almacenamiento cargando los documentos desde el archivo
+        /// Inicializa el almacenamiento cargando los documentos desde el archivo en disco.
         /// </summary>
         public async Task InitAsync()
         {
@@ -55,16 +53,16 @@ namespace Infrastructure.Storage
         }
 
         /// <summary>
-        /// Obtiene un documento por su identificador
+        /// Obtiene un documento por su identificador único, usando caché si está disponible.
         /// </summary>
-        /// <param name="id">Identificador único del documento</param>
-        /// <returns>El documento si existe, null en caso contrario</returns>
+        /// <param name="id">Identificador único del documento.</param>
+        /// <returns>El documento si existe, null en caso contrario.</returns>
         public async Task<Document?> GetByIdAsync(Guid id)
         {
             if (_cache != null)
             {
-                var cached = await _cache.GetAsync<Document>($"document_{id}");
-                if (cached != null) return cached;
+                var cachedObj = await _cache.GetAsync<Document>($"document_{id}");
+                if (cachedObj is Document cached) return cached;
             }
 
             if (_documents.TryGetValue(id, out var document))
@@ -78,21 +76,23 @@ namespace Infrastructure.Storage
         }
 
         /// <summary>
-        /// Obtiene todos los documentos almacenados
+        /// Obtiene todos los documentos almacenados en memoria.
         /// </summary>
-        /// <returns>Lista de todos los documentos</returns>
+        /// <returns>Lista de todos los documentos.</returns>
         public Task<List<Document>> GetAllAsync()
         {
             return Task.FromResult(new List<Document>(_documents.Values));
         }
 
         /// <summary>
-        /// Guarda un nuevo documento
+        /// Guarda un nuevo documento y lo persiste en disco y caché.
         /// </summary>
-        /// <param name="document">Documento a guardar</param>
-        /// <returns>El documento guardado</returns>
+        /// <param name="document">Documento a guardar.</param>
+        /// <returns>El documento guardado.</returns>
         public async Task<Document> SaveAsync(Document document)
         {
+            if (document == null)
+                throw new ArgumentNullException(nameof(document));
             _documents[document.Id] = document;
             await _cache.SetAsync($"document_{document.Id}", document);
             await SaveDocumentsAsync();
@@ -100,11 +100,13 @@ namespace Infrastructure.Storage
         }
 
         /// <summary>
-        /// Actualiza un documento existente
+        /// Actualiza un documento existente y sincroniza los cambios en disco y caché.
         /// </summary>
-        /// <param name="document">Documento con los datos actualizados</param>
+        /// <param name="document">Documento con los datos actualizados.</param>
         public async Task UpdateAsync(Document document)
         {
+            if (document == null)
+                throw new ArgumentNullException(nameof(document));
             if (_documents.ContainsKey(document.Id))
             {
                 _documents[document.Id] = document;
@@ -114,11 +116,13 @@ namespace Infrastructure.Storage
         }
 
         /// <summary>
-        /// Elimina un documento por su identificador
+        /// Elimina un documento por su identificador y actualiza disco y caché.
         /// </summary>
-        /// <param name="id">Identificador del documento a eliminar</param>
+        /// <param name="id">Identificador del documento a eliminar.</param>
         public async Task DeleteAsync(Guid id)
         {
+            if (id == Guid.Empty)
+                throw new ArgumentException("Id cannot be empty.", nameof(id));
             if (_documents.Remove(id))
             {
                 await _cache.RemoveAsync($"document_{id}");
@@ -127,16 +131,16 @@ namespace Infrastructure.Storage
         }
 
         /// <summary>
-        /// Invalida la caché para un documento específico
+        /// Invalida la caché para un documento específico.
         /// </summary>
-        /// <param name="id">Identificador del documento</param>
+        /// <param name="id">Identificador del documento.</param>
         public Task InvalidateCacheAsync(Guid id)
         {
             return _cache.RemoveAsync($"document_{id}");
         }
 
         /// <summary>
-        /// Invalida toda la caché de documentos
+        /// Invalida toda la caché de documentos.
         /// </summary>
         public Task InvalidateAllCacheAsync()
         {
@@ -144,7 +148,7 @@ namespace Infrastructure.Storage
         }
 
         /// <summary>
-        /// Guarda todos los documentos en el archivo JSON
+        /// Persiste todos los documentos en el archivo JSON en disco.
         /// </summary>
         private async Task SaveDocumentsAsync()
         {

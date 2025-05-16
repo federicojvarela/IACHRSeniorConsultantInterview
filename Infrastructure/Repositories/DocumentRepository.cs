@@ -11,13 +11,13 @@ namespace Infrastructure.Repositories
     /// </summary>
     public class DocumentRepository : IDocumentRepository
     {
-        private readonly FileDocumentStorage _storage;
+        private readonly IDocumentStorage _storage;
 
         /// <summary>
         /// Constructor del repositorio de documentos
         /// </summary>
         /// <param name="storage">Servicio de almacenamiento de documentos en archivos</param>
-        public DocumentRepository(FileDocumentStorage storage)
+        public DocumentRepository(IDocumentStorage storage)
         {
             _storage = storage;
         }
@@ -66,6 +66,8 @@ namespace Infrastructure.Repositories
         /// <param name="id">Identificador único del documento a eliminar</param>
         public async Task DeleteAsync(Guid id)
         {
+            if (id == Guid.Empty)
+                throw new ArgumentException("Id cannot be empty.", nameof(id));
             await _storage.DeleteAsync(id);
         }
     }
