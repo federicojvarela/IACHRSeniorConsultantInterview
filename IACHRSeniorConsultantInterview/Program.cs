@@ -31,11 +31,6 @@ builder.Services.AddInfrastructure(basePath);
 // 5. Cache general
 builder.Services.AddMemoryCache(); // Necesaria para ambos
 
-// ⬇️ REGISTROS CLAROS Y SEPARADOS ⬇️
-
-// ✅ Cache genérica reutilizable
-builder.Services.AddSingleton<ICache, MemoryCacheService>();
-
 
 // ✅ Cache específica para catalogs.json
 builder.Services.AddSingleton<ICatalogCache>(provider =>
