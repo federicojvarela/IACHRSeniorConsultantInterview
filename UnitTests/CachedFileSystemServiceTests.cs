@@ -4,12 +4,27 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace UnitTests.Services
 {
+    /// <summary>
+    /// Pruebas unitarias para CachedFileSystemService, que verifica el comportamiento de caché sobre operaciones de archivos.
+    /// </summary>
     public class CachedFileSystemServiceTests
     {
+        /// <summary>
+        /// Mock para el servicio de sistema de archivos subyacente.
+        /// </summary>
         private readonly Mock<IFileSystemService> _inner;
+        /// <summary>
+        /// Servicio de caché en memoria utilizado en las pruebas.
+        /// </summary>
         private readonly MemoryCacheService _cache;
+        /// <summary>
+        /// Instancia del servicio a testear.
+        /// </summary>
         private readonly CachedFileSystemService _service;
 
+        /// <summary>
+        /// Inicializa los mocks y el servicio para los tests.
+        /// </summary>
         public CachedFileSystemServiceTests()
         {
             _inner = new Mock<IFileSystemService>();
@@ -17,6 +32,9 @@ namespace UnitTests.Services
             _service = new CachedFileSystemService(_inner.Object, _cache);
         }
 
+        /// <summary>
+        /// Verifica que FileExistsAsync utiliza la caché y solo consulta el sistema de archivos una vez.
+        /// </summary>
         [Fact]
         public async Task FileExistsShouldUseCache()
         {
@@ -31,6 +49,9 @@ namespace UnitTests.Services
             _inner.Verify(f => f.FileExistsAsync(path), Times.Once());
         }
 
+        /// <summary>
+        /// Verifica que ReadFileAsync cachea el contenido y solo lee una vez del sistema de archivos.
+        /// </summary>
         [Fact]
         public async Task ReadFileAsyncShouldCacheContent()
         {
@@ -45,6 +66,9 @@ namespace UnitTests.Services
             _inner.Verify(f => f.ReadFileAsync(path), Times.Once());
         }
 
+        /// <summary>
+        /// Verifica que WriteFileAsync refresca la caché correctamente.
+        /// </summary>
         [Fact]
         public async Task WriteFileAsyncShouldRefreshCache()
         {

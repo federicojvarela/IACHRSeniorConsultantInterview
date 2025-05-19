@@ -5,21 +5,36 @@ namespace UnitTests
 {
     public class SimpleDocumentProcessorTests
     {
+        /// <summary>
+        /// Mock para el repositorio de documentos
+        /// </summary>
         private readonly Mock<IDocumentRepository> _mockRepo;
+        /// <summary>
+        /// Procesador a testear
+        /// </summary>
         private readonly SimpleDocumentProcessor _processor;
 
+        /// <summary>
+        /// Inicializa los mocks y el procesador para los tests
+        /// </summary>
         public SimpleDocumentProcessorTests()
         {
             _mockRepo = new Mock<IDocumentRepository>();
             _processor = new SimpleDocumentProcessor(_mockRepo.Object);
         }
 
+        /// <summary>
+        /// Verifica que procesar un documento nulo lanza ArgumentNullException
+        /// </summary>
         [Fact]
         public async Task ProcessDocument_ThrowsArgumentNullException_WhenDocumentIsNull()
         {
             await Assert.ThrowsAsync<ArgumentNullException>(() => _processor.ProcessDocument(null));
         }
 
+        /// <summary>
+        /// Verifica que procesar tipos soportados asigna el estado y resultado correctos
+        /// </summary>
         [Theory]
         [InlineData("application/pdf", ProcessingStatus.Completed, "PDF procesado correctamente")]
         [InlineData("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ProcessingStatus.Completed, "Documento Word procesado correctamente")]
@@ -35,6 +50,9 @@ namespace UnitTests
             _mockRepo.Verify(r => r.UpdateAsync(doc), Times.Once);
         }
 
+        /// <summary>
+        /// Verifica que procesar un tipo no soportado asigna estado Failed y resultado adecuado
+        /// </summary>
         [Fact]
         public async Task ProcessDocument_SetsFailedStatusAndResult_ForUnsupportedType()
         {
@@ -46,6 +64,9 @@ namespace UnitTests
             _mockRepo.Verify(r => r.UpdateAsync(doc), Times.Once);
         }
 
+        /// <summary>
+        /// Verifica que CheckStatusAsync retorna el estado correcto del documento
+        /// </summary>
         [Fact]
         public async Task CheckStatusAsync_ReturnsDocumentStatus()
         {
@@ -56,6 +77,9 @@ namespace UnitTests
             Assert.Equal(ProcessingStatus.Processing, status);
         }
 
+        /// <summary>
+        /// Verifica que CheckStatusAsync retorna Failed cuando el documento no existe
+        /// </summary>
         [Fact]
         public async Task CheckStatusAsync_ReturnsFailed_WhenDocumentNotFound()
         {

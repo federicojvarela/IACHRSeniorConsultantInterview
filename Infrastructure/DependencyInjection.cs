@@ -1,9 +1,10 @@
-﻿using Core.Interfaces;
+using Core.Interfaces;
 using Core.Services.Documents;
 using Infrastructure.Storage;
 using Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.Services;
+using Infrastructure.Workers;
 
 namespace Infrastructure
 {
@@ -63,6 +64,10 @@ namespace Infrastructure
 
             // Registro de procesadores de documentos
             services.AddScoped<IDocumentProcessor, SimpleDocumentProcessor>();
+
+            // Cola y worker de procesamiento de documentos
+            services.AddSingleton<IDocumentProcessingQueue, DocumentProcessingQueue>();
+            services.AddHostedService<Workers.DocumentProcessingWorker>();
 
             // Registro de servicios de negocio
             services.AddScoped<DocumentService>();  // Servicio para gestión de documentos
