@@ -826,11 +826,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\Infrastructure\\Infrastructure.csproj",
+      "projectUniqueName": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj",
       "projectName": "Infrastructure",
-      "projectPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\Infrastructure\\Infrastructure.csproj",
+      "projectPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj",
       "packagesPath": "C:\\Users\\FedericoJorgeVarela\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\Infrastructure\\obj\\",
+      "outputPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -851,8 +851,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\Core\\Core.csproj": {
-              "projectPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\Core\\Core.csproj"
+            "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Core\\Core.csproj": {
+              "projectPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Core\\Core.csproj"
             }
           }
         }

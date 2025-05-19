@@ -45,6 +45,7 @@ namespace UnitTests.Storage
         _fileSystemMock.Setup(f => f.ReadFileAsync(_testFilePath)).ReturnsAsync(json);
 
         var storage = new FileDocumentStorage(_cacheMock.Object, _loggerMock.Object, _fileSystemMock.Object, _testBasePath);
+        await storage.InitAsync();
         var result = await storage.GetByIdAsync(docId);
 
         Assert.NotNull(result);

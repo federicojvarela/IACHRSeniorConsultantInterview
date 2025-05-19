@@ -18,6 +18,7 @@ namespace Infrastructure.Storage
 
         /// <summary>
         /// Inicializa una nueva instancia de FileDocumentStorage.
+        /// La carga de los datos se debe realizar llamando a <see cref="InitAsync"/>.
         /// </summary>
         /// <param name="cache">Servicio de caché.</param>
         /// <param name="logger">Servicio de logging.</param>
@@ -33,7 +34,7 @@ namespace Infrastructure.Storage
 
             _fileSystem.EnsureDirectoryExists(basePath);
 
-            InitAsync().Wait();
+            // La carga inicial se realiza mediante InitAsync()
         }
 
         /// <summary>
