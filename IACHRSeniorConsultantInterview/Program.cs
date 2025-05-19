@@ -32,7 +32,7 @@ builder.Services.AddInfrastructure(basePath);
 builder.Services.AddMemoryCache(); // Necesaria para ambos
 
 
-// ✅ Cache específica para catalogs.json
+// Cache específica para catalogs.json
 builder.Services.AddSingleton<ICatalogCache>(provider =>
 {
     var cache = provider.GetRequiredService<IMemoryCache>();

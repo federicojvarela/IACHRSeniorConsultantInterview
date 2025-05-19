@@ -122,3 +122,11 @@ Ruta: `/UnitTests/`
 - Expuesta por el controlador `CachedCatalogController`
 
 ---
+
+## Procesamiento asincrónico de documentos
+
+- `DocumentService.UploadDocumentAsync` encola documentos mediante `IDocumentProcessingQueue`.
+- `DocumentProcessingWorker` (en `Infrastructure/Workers`) se ejecuta como servicio hospedado y procesa los elementos de la cola.
+- El uso de `Channel<T>` permite tener varias instancias del worker, habilitando la escalabilidad horizontal.
+
+Este diseño desacopla el tiempo de respuesta de la API del procesamiento de documentos. La configuración y ejecución del worker se manejan automáticamente al registrar la infraestructura con `AddInfrastructure` en `Program.cs`.
