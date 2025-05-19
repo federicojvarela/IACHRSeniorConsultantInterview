@@ -104,7 +104,7 @@ Ruta: `/UnitTests/`
 
 ---
 
-## 🔄 Manejo de caché actualizado
+## Manejo de caché
 
 ### 🔹 `MemoryCacheService`
 - Antes: usaba `ICache<object>`, con errores de compilación y operaciones riesgosas.
