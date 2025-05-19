@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\UnitTests\\UnitTests.csproj": {}
+    "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\UnitTests\\UnitTests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Core\\Core.csproj": {
+    "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Core\\Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Core\\Core.csproj",
+        "projectUniqueName": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Core\\Core.csproj",
         "projectName": "Core",
-        "projectPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Core\\Core.csproj",
+        "projectPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Core\\Core.csproj",
         "packagesPath": "C:\\Users\\FedericoJorgeVarela\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Core\\obj\\",
+        "outputPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -79,14 +79,14 @@
         }
       }
     },
-    "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\IACHRSeniorConsultantInterview\\WebApi.csproj": {
+    "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\IACHRSeniorConsultantInterview\\WebApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\IACHRSeniorConsultantInterview\\WebApi.csproj",
+        "projectUniqueName": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\IACHRSeniorConsultantInterview\\WebApi.csproj",
         "projectName": "WebApi",
-        "projectPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\IACHRSeniorConsultantInterview\\WebApi.csproj",
+        "projectPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\IACHRSeniorConsultantInterview\\WebApi.csproj",
         "packagesPath": "C:\\Users\\FedericoJorgeVarela\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\IACHRSeniorConsultantInterview\\obj\\",
+        "outputPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\IACHRSeniorConsultantInterview\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -107,11 +107,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Core\\Core.csproj": {
-                "projectPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Core\\Core.csproj"
+              "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Core\\Core.csproj": {
+                "projectPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Core\\Core.csproj"
               },
-              "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj"
+              "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj"
               }
             }
           }
@@ -164,14 +164,14 @@
         }
       }
     },
-    "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj": {
+    "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj",
         "projectName": "Infrastructure",
-        "projectPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj",
+        "projectPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj",
         "packagesPath": "C:\\Users\\FedericoJorgeVarela\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Infrastructure\\obj\\",
+        "outputPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -192,8 +192,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Core\\Core.csproj": {
-                "projectPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Core\\Core.csproj"
+              "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Core\\Core.csproj": {
+                "projectPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Core\\Core.csproj"
               }
             }
           }
@@ -251,14 +251,14 @@
         }
       }
     },
-    "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\UnitTests\\UnitTests.csproj": {
+    "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\UnitTests\\UnitTests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\UnitTests\\UnitTests.csproj",
+        "projectUniqueName": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\UnitTests\\UnitTests.csproj",
         "projectName": "UnitTests",
-        "projectPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\UnitTests\\UnitTests.csproj",
+        "projectPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\UnitTests\\UnitTests.csproj",
         "packagesPath": "C:\\Users\\FedericoJorgeVarela\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\UnitTests\\obj\\",
+        "outputPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\UnitTests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -279,14 +279,14 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Core\\Core.csproj": {
-                "projectPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Core\\Core.csproj"
+              "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Core\\Core.csproj": {
+                "projectPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Core\\Core.csproj"
               },
-              "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\IACHRSeniorConsultantInterview\\WebApi.csproj": {
-                "projectPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\IACHRSeniorConsultantInterview\\WebApi.csproj"
+              "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\IACHRSeniorConsultantInterview\\WebApi.csproj": {
+                "projectPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\IACHRSeniorConsultantInterview\\WebApi.csproj"
               },
-              "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\FedericoJorgeVarela\\Downloads\\IACHRSeniorConsultantInterview 1\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj"
+              "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\FedericoJorgeVarela\\Documents\\Personal\\Repos\\IACHR\\IACHRSeniorConsultantInterview\\Infrastructure\\Infrastructure.csproj"
               }
             }
           }
