@@ -6,12 +6,27 @@ using Xunit;
 
 namespace UnitTests.Storage
 {
+    /// <summary>
+    /// Pruebas unitarias para FileCatalogCache, que verifica el comportamiento de la caché de catálogos.
+    /// </summary>
     public class FileCatalogCacheTests
     {
+        /// <summary>
+        /// Directorio temporal para pruebas.
+        /// </summary>
         private readonly string _testDir;
+        /// <summary>
+        /// Ruta al archivo de catálogos temporal.
+        /// </summary>
         private readonly string _testFilePath;
+        /// <summary>
+        /// Instancia de caché en memoria.
+        /// </summary>
         private readonly IMemoryCache _cache;
 
+        /// <summary>
+        /// Inicializa el entorno de pruebas creando un directorio y caché temporal.
+        /// </summary>
         public FileCatalogCacheTests()
         {
             _testDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -21,10 +36,12 @@ namespace UnitTests.Storage
             _cache = new MemoryCache(new MemoryCacheOptions());
         }
 
+        /// <summary>
+        /// Verifica que la caché se invalida cuando el archivo cambia y se recarga correctamente.
+        /// </summary>
         [Fact]
         public async Task GetCatalogShouldInvalidateCacheWhenFileChanges()
         {
-            // Arrange: contenido inicial
             var original = new[]
             {
                 new CatalogDto
@@ -42,12 +59,10 @@ namespace UnitTests.Storage
 
             var catalogCache = new FileCatalogCache(_testDir, _cache);
 
-            // Act 1: leer cache inicial
             var firstResult = catalogCache.GetCatalog();
             Assert.Single(firstResult);
             Assert.Equal("a", firstResult[0].Id);
 
-            // Act 2: modificar archivo
             var updated = new[]
             {
                 new CatalogDto
@@ -63,15 +78,16 @@ namespace UnitTests.Storage
             };
             File.WriteAllText(_testFilePath, JsonSerializer.Serialize(updated));
 
-            // Esperar a que FileSystemWatcher detecte el cambio
-            await Task.Delay(500); // <- tiempo suficiente para que se invalide
+            await Task.Delay(500);
 
-            // Act 3: volver a leer el catálogo (debería venir nuevo)
             var secondResult = catalogCache.GetCatalog();
             Assert.Single(secondResult);
             Assert.Equal("b", secondResult[0].Id);
         }
 
+        /// <summary>
+        /// Verifica que GetCatalog retorna una lista vacía cuando el archivo no existe.
+        /// </summary>
         [Fact]
         public void GetCatalogShouldReturnEmptyListWhenFileMissing()
         {
@@ -83,6 +99,9 @@ namespace UnitTests.Storage
             Assert.Empty(result);
         }
 
+        /// <summary>
+        /// Verifica que GetCatalogAsync retorna una lista vacía cuando el archivo no existe.
+        /// </summary>
         [Fact]
         public async Task GetCatalogAsyncShouldReturnEmptyListWhenFileMissing()
         {
@@ -95,10 +114,12 @@ namespace UnitTests.Storage
             Assert.Empty(result);
         }
 
+        /// <summary>
+        /// Verifica que RefreshAsync repuebla la caché correctamente.
+        /// </summary>
         [Fact]
         public async Task RefreshAsyncShouldRepopulateCache()
         {
-            // Arrange: create initial file
             var testDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(testDir);
             var testFilePath = Path.Combine(testDir, "catalogs.json");
@@ -120,11 +141,9 @@ namespace UnitTests.Storage
             };
             File.WriteAllText(testFilePath, JsonSerializer.Serialize(original));
 
-            // Act: call RefreshAsync and then GetCatalog
             await catalogCache.RefreshAsync();
             var result = catalogCache.GetCatalog();
 
-            // Assert: the cache should be repopulated with the original data
             Assert.Single(result);
             Assert.Equal("a", result[0].Id);
         }

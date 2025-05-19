@@ -1,9 +1,10 @@
-﻿using Core.Interfaces;
+using Core.Interfaces;
 using Core.Services.Documents;
 using Infrastructure.Storage;
 using Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.Services;
+using Infrastructure.Workers;
 
 namespace Infrastructure
 {
@@ -37,7 +38,10 @@ namespace Infrastructure
             // Configuración de servicios de almacenamiento y utilidades
             services.AddSingleton<ICache, MemoryCacheService>();            // Servicio de caché en memoria
             services.AddSingleton<ILoggerService, LoggerServices>();        // Servicio de logging
-            services.AddSingleton<IFileSystemService, FileSystemService>(); // Servicio de sistema de archivos
+            services.AddSingleton<IFileSystemService>(provider =>
+                new CachedFileSystemService(
+                    new FileSystemService(),
+                    provider.GetRequiredService<ICache>()));
 
             // Configuración del almacenamiento de documentos
             services.AddSingleton<FileDocumentStorage>(provider =>
@@ -48,6 +52,8 @@ namespace Infrastructure
                     Path.Combine(basePath, "data")
                 )
             );
+            services.AddSingleton<IDocumentStorage>(sp =>
+                sp.GetRequiredService<FileDocumentStorage>());
 
             // Registro de repositorios
             services.AddScoped<IDocumentRepository, DocumentRepository>();
@@ -58,6 +64,10 @@ namespace Infrastructure
 
             // Registro de procesadores de documentos
             services.AddScoped<IDocumentProcessor, SimpleDocumentProcessor>();
+
+            // Cola y worker de procesamiento de documentos
+            services.AddSingleton<IDocumentProcessingQueue, DocumentProcessingQueue>();
+            services.AddHostedService<Workers.DocumentProcessingWorker>();
 
             // Registro de servicios de negocio
             services.AddScoped<DocumentService>();  // Servicio para gestión de documentos

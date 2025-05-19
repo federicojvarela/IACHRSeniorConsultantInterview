@@ -2,6 +2,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Core.DTOs;
 using Core.Interfaces;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Implementación de ICatalogCache que utiliza archivos y caché en memoria para almacenar elementos de catálogo.
@@ -81,13 +82,35 @@ public class FileCatalogCache : ICatalogCache
             .ToList() ?? new();
     }
 
+    private async Task<List<CatalogItemDto>> LoadCatalogFromDiskAsync()
+    {
+        var filePath = Path.Combine(_catalogDirectory, "catalogs.json");
+        if (!File.Exists(filePath)) return new();
+
+        var json = await File.ReadAllTextAsync(filePath);
+        var raw = JsonSerializer.Deserialize<List<CatalogDto>>(json);
+        return raw?
+            .SelectMany(cat => cat.Items.Select(item => new CatalogItemDto
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Value = item.Value
+            }))
+            .ToList() ?? new();
+    }
+
     /// <summary>
     /// Obtiene la lista de elementos del catálogo de forma asíncrona.
     /// </summary>
     /// <returns>Lista de elementos del catálogo.</returns>
     public async Task<List<CatalogItemDto>?> GetCatalogAsync()
     {
-        return await Task.FromResult(GetCatalog());
+        if (_cache.Get(_cacheKey) is List<CatalogItemDto> cached)
+            return cached;
+
+        var catalog = await LoadCatalogFromDiskAsync();
+        _cache.Set(_cacheKey, catalog, DateTimeOffset.Now.AddMinutes(10));
+        return catalog;
     }
 
     /// <summary>

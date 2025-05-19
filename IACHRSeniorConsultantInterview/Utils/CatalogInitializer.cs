@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace WebApi.Utils
 {
@@ -12,7 +13,7 @@ namespace WebApi.Utils
         /// Si el archivo existe pero está corrupto, lo reemplaza por datos válidos.
         /// </summary>
         /// <param name="catalogsDestination">Ruta donde debe existir el archivo de catálogos.</param>
-        public static void EnsureCatalogsExist(string catalogsDestination)
+        public static async Task EnsureCatalogsExistAsync(string catalogsDestination)
         {
             // Verificar explícitamente si el archivo de catálogos existe
             if (!File.Exists(catalogsDestination))
@@ -52,7 +53,7 @@ namespace WebApi.Utils
 
                 // Serializar y guardar los catálogos en formato JSON
                 var json = JsonSerializer.Serialize(sampleCatalogs, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(catalogsDestination, json);
+                await File.WriteAllTextAsync(catalogsDestination, json);
                 Console.WriteLine("Archivo de catálogos creado exitosamente");
             }
             else
@@ -61,7 +62,7 @@ namespace WebApi.Utils
                 // Verificar que el contenido sea válido intentando deserializarlo
                 try
                 {
-                    var content = File.ReadAllText(catalogsDestination);
+                    var content = await File.ReadAllTextAsync(catalogsDestination);
                     var catalogs = JsonSerializer.Deserialize<object[]>(content);
                     Console.WriteLine($"El archivo de catálogos contiene {catalogs?.Length ?? 0} elementos");
                 }
@@ -88,7 +89,7 @@ namespace WebApi.Utils
 
                     // Serializar y guardar los nuevos catálogos
                     var json = JsonSerializer.Serialize(sampleCatalogs, new JsonSerializerOptions { WriteIndented = true });
-                    File.WriteAllText(catalogsDestination, json);
+                    await File.WriteAllTextAsync(catalogsDestination, json);
                     Console.WriteLine("Archivo de catálogos reemplazado exitosamente");
                 }
             }

@@ -3,7 +3,7 @@ using Core.Interfaces;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -13,6 +13,7 @@ namespace Infrastructure.Repositories
     public class CatalogRepository : ICatalogRepository
     {
         private readonly string _catalogFilePath;
+        private readonly Task _loadingTask;
         private List<Catalog> _catalogs = new List<Catalog>();
 
         /// <summary>
@@ -22,21 +23,21 @@ namespace Infrastructure.Repositories
         public CatalogRepository(string catalogFilePath)
         {
             _catalogFilePath = catalogFilePath;
-            LoadCatalogs();
+            _loadingTask = LoadCatalogsAsync();
         }
 
         /// <summary>
         /// Carga los catálogos desde el archivo JSON
         /// </summary>
-        private void LoadCatalogs()
+        private async Task LoadCatalogsAsync()
         {
             try
             {
-                // Simulamos una carga lenta para emular un escenario real               
-                Thread.Sleep(1000);
+                // Simulamos una carga lenta para emular un escenario real
+                await Task.Delay(1000);
 
                 // Leer el contenido del archivo JSON
-                var json = File.ReadAllText(_catalogFilePath);
+                var json = await File.ReadAllTextAsync(_catalogFilePath);
                 Console.WriteLine($"Contenido leído del archivo: {json}");
 
                 // Configuración de las opciones de deserialización del JSON
@@ -71,6 +72,7 @@ namespace Infrastructure.Repositories
         /// <returns>El catálogo encontrado o un catálogo vacío si no existe</returns>
         public async Task<Catalog> GetCatalogByIdAsync(string id)
         {
+            await _loadingTask;
             // Simulamos una consulta lenta para emular un escenario real
             await Task.Delay(500);
             return _catalogs.FirstOrDefault(c => c.Id == id) ?? new Catalog();
@@ -82,6 +84,7 @@ namespace Infrastructure.Repositories
         /// <returns>Lista de todos los catálogos</returns>
         public async Task<List<Catalog>> GetAllCatalogsAsync()
         {
+            await _loadingTask;
             // Simulamos una consulta lenta para emular un escenario real
             await Task.Delay(500);
             return _catalogs;
@@ -95,6 +98,7 @@ namespace Infrastructure.Repositories
         /// <returns>El elemento del catálogo encontrado o un elemento vacío si no existe</returns>
         public async Task<CatalogItem> GetCatalogItemAsync(string catalogId, string itemId)
         {
+            await _loadingTask;
             // Simulamos una consulta lenta para emular un escenario real
             await Task.Delay(300);
             var catalog = _catalogs.FirstOrDefault(c => c.Id == catalogId);

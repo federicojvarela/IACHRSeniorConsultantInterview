@@ -3,15 +3,27 @@ namespace UnitTests
 {
     public class LoggerServicesTests
     {
+        /// <summary>
+        /// Mock para ILogger de Microsoft
+        /// </summary>
         private readonly Mock<ILogger<LoggerServices>> _mockLogger;
+        /// <summary>
+        /// Instancia del servicio a testear
+        /// </summary>
         private readonly LoggerServices _loggerServices;
 
+        /// <summary>
+        /// Inicializa el mock y el servicio para los tests
+        /// </summary>
         public LoggerServicesTests()
         {
             _mockLogger = new Mock<ILogger<LoggerServices>>();
             _loggerServices = new LoggerServices(_mockLogger.Object);
         }
 
+        /// <summary>
+        /// Verifica que LogInformation llama a ILogger con LogLevel.Information
+        /// </summary>
         [Fact]
         public void LogInformation_CallsILoggerLogInformation()
         {
@@ -25,6 +37,9 @@ namespace UnitTests
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
         }
 
+        /// <summary>
+        /// Verifica que LogError llama a ILogger con LogLevel.Error
+        /// </summary>
         [Fact]
         public void LogError_CallsILoggerLogError()
         {
@@ -38,6 +53,9 @@ namespace UnitTests
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
         }
 
+        /// <summary>
+        /// Verifica que LogError con excepción llama a ILogger con LogLevel.Error y la excepción
+        /// </summary>
         [Fact]
         public void LogError_WithException_CallsILoggerLogErrorWithException()
         {
@@ -52,6 +70,9 @@ namespace UnitTests
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
         }
 
+        /// <summary>
+        /// Verifica que LogWarning llama a ILogger con LogLevel.Warning
+        /// </summary>
         [Fact]
         public void LogWarning_CallsILoggerLogWarning()
         {

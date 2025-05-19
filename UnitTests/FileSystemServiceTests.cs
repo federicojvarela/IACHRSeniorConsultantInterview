@@ -27,14 +27,14 @@ namespace UnitTests.Services
         /// Prueba que verifica que FileExists devuelve verdadero cuando el archivo existe
         /// </summary>
         [Fact]
-        public void FileExistsShouldReturnTrueWhenFileExists()
+        public async Task FileExistsShouldReturnTrueWhenFileExists()
         {
             // Preparación
             var filePath = Path.Combine(_testDirectory, "testfile.txt");
             File.WriteAllText(filePath, "Test content");
 
             // Acción
-            var result = _fileSystemService.FileExists(filePath);
+            var result = await _fileSystemService.FileExistsAsync(filePath);
 
             // Verificación
             Assert.True(result);
@@ -44,13 +44,13 @@ namespace UnitTests.Services
         /// Prueba que verifica que FileExists devuelve falso cuando el archivo no existe
         /// </summary>
         [Fact]
-        public void FileExistsShouldReturnFalseWhenFileDoesNotExist()
+        public async Task FileExistsShouldReturnFalseWhenFileDoesNotExist()
         {
             // Preparación
             var filePath = Path.Combine(_testDirectory, "nonexistentfile.txt");
 
             // Acción
-            var result = _fileSystemService.FileExists(filePath);
+            var result = await _fileSystemService.FileExistsAsync(filePath);
 
             // Verificación
             Assert.False(result);

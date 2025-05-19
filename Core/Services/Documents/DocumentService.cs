@@ -2,7 +2,6 @@
 using Core.Interfaces;
 using Core.Enums;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Core.Services.Documents
@@ -13,8 +12,8 @@ namespace Core.Services.Documents
     public class DocumentService
     {
         private readonly IDocumentRepository _documentRepository;
-        private readonly IDocumentProcessor _documentProcessor;
         private readonly ILoggerService _loggerService;
+        private readonly IDocumentProcessingQueue _processingQueue;
 
         /// <summary>
         /// Inicializa una nueva instancia del servicio de documentos.
@@ -24,12 +23,12 @@ namespace Core.Services.Documents
         /// <param name="loggerService">Servicio de logging.</param>
         public DocumentService(
             IDocumentRepository documentRepository,
-            IDocumentProcessor documentProcessor,
-            ILoggerService loggerService)
+            ILoggerService loggerService,
+            IDocumentProcessingQueue processingQueue)
         {
             _documentRepository = documentRepository;
-            _documentProcessor = documentProcessor;
             _loggerService = loggerService;
+            _processingQueue = processingQueue;
         }
 
         /// <summary>
@@ -63,66 +62,9 @@ namespace Core.Services.Documents
 
             var savedDocument = await _documentRepository.SaveAsync(document);
 
-            await ProcessDocumentAsync(savedDocument.Id);
+            _processingQueue.Enqueue(savedDocument.Id);
 
             return savedDocument;
-        }
-
-        /// <summary>
-        /// Procesa un documento de manera interna, actualizando su estado y resultado.
-        /// </summary>
-        /// <param name="documentId">Identificador único del documento a procesar.</param>
-        private async Task ProcessDocumentAsync(Guid documentId)
-        {
-            try
-            {
-                _loggerService.LogInformation($"Procesando documento: {documentId}");
-                // Obtener el documento del repositorio
-                var document = await _documentRepository.GetByIdAsync(documentId);
-                if (document == null)
-                {
-                    _loggerService.LogWarning($"Documento con ID {documentId} no encontrado.");
-                    return;
-                }
-
-                document.Status = ProcessingStatus.Processing;
-                await _documentRepository.UpdateAsync(document);
-
-                // Simular procesamiento que toma tiempo
-                await Task.Delay(2000);
-
-                // Procesar el documento
-                await _documentProcessor.ProcessDocument(document);
-
-                document.Status = ProcessingStatus.Completed;
-                document.ProcessingResult = "Procesamiento completado con éxito";
-                await _documentRepository.UpdateAsync(document);
-            }
-            catch (Exception)
-            {
-                // Registrar un mensaje de error genérico sin exponer los detalles de la excepción
-                _loggerService.LogError($"Error procesando el documento: {documentId}. Ocurrió un error durante el procesamiento.");
-
-                try
-                {
-                    var document = await _documentRepository.GetByIdAsync(documentId);
-                    if (document != null)
-                    {
-                        document.Status = ProcessingStatus.Failed;
-                        document.ProcessingResult = "Error en el procesamiento."; // Mensaje genérico
-                        await _documentRepository.UpdateAsync(document);
-                    }
-                    else
-                    {
-                        _loggerService.LogWarning($"No se pudo recuperar el documento con ID {documentId} después de un error de procesamiento.");
-                    }
-                }
-                catch (Exception innerEx)
-                {
-                    // Registrar el error que ocurrió al intentar recuperar el documento
-                    _loggerService.LogError($"Error al recuperar el documento {documentId} después de un fallo en el procesamiento: {innerEx.Message}");
-                }
-            }
         }
 
         /// <summary>
@@ -130,7 +72,7 @@ namespace Core.Services.Documents
         /// </summary>
         /// <param name="id">Identificador único del documento.</param>
         /// <returns>El documento encontrado o null si no existe.</returns>
-        public async Task<Document> GetDocument(Guid id)
+        public async Task<Document?> GetDocument(Guid id)
         {
             return await _documentRepository.GetByIdAsync(id);
         }

@@ -17,7 +17,7 @@ namespace Infrastructure.Services
         /// </summary>
         /// <param name="path">Ruta del archivo a verificar</param>
         /// <returns>True si el archivo existe, False en caso contrario</returns>
-        public bool FileExists(string path) => File.Exists(path);
+        public Task<bool> FileExistsAsync(string path) => Task.FromResult(File.Exists(path));
 
         /// <summary>
         /// Lee el contenido de un archivo de forma asíncrona
