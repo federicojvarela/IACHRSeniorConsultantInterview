@@ -17,7 +17,7 @@ string catalogsDestination = Path.Combine(dataDirectory, "catalogs.json");
 Console.WriteLine($"Ruta base de catálogos: {catalogsDestination}");
 
 // 2. Inicialización de catálogos
-CatalogInitializer.EnsureCatalogsExist(catalogsDestination);
+await CatalogInitializer.EnsureCatalogsExistAsync(catalogsDestination);
 
 // 3. Servicios generales
 builder.Services.AddControllers();
@@ -49,8 +49,11 @@ var app = builder.Build();
 
 // 7. Inicialización de servicios
 var serviceProvider = app.Services;
-var storage = serviceProvider.GetRequiredService<FileDocumentStorage>();
-await storage.InitAsync();
+var storage = serviceProvider.GetRequiredService<IDocumentStorage>();
+if (storage is FileDocumentStorage fileStorage)
+{
+    await fileStorage.InitAsync();
+}
 
 // 8. Pipeline HTTP
 if (app.Environment.IsDevelopment())

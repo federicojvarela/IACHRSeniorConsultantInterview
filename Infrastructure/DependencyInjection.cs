@@ -37,7 +37,10 @@ namespace Infrastructure
             // Configuración de servicios de almacenamiento y utilidades
             services.AddSingleton<ICache, MemoryCacheService>();            // Servicio de caché en memoria
             services.AddSingleton<ILoggerService, LoggerServices>();        // Servicio de logging
-            services.AddSingleton<IFileSystemService, FileSystemService>(); // Servicio de sistema de archivos
+            services.AddSingleton<IFileSystemService>(provider =>
+                new CachedFileSystemService(
+                    new FileSystemService(),
+                    provider.GetRequiredService<ICache>()));
 
             // Configuración del almacenamiento de documentos
             services.AddSingleton<FileDocumentStorage>(provider =>
@@ -48,6 +51,8 @@ namespace Infrastructure
                     Path.Combine(basePath, "data")
                 )
             );
+            services.AddSingleton<IDocumentStorage>(sp =>
+                sp.GetRequiredService<FileDocumentStorage>());
 
             // Registro de repositorios
             services.AddScoped<IDocumentRepository, DocumentRepository>();

@@ -41,7 +41,7 @@ namespace UnitTests.Storage
         var documents = new Dictionary<Guid, Document> { { docId, new Document { Id = docId, FileName = "LoadedDoc.txt" } } };
         var json = JsonSerializer.Serialize(documents);
 
-        _fileSystemMock.Setup(f => f.FileExists(_testFilePath)).Returns(true);
+        _fileSystemMock.Setup(f => f.FileExistsAsync(_testFilePath)).ReturnsAsync(true);
         _fileSystemMock.Setup(f => f.ReadFileAsync(_testFilePath)).ReturnsAsync(json);
 
         var storage = new FileDocumentStorage(_cacheMock.Object, _loggerMock.Object, _fileSystemMock.Object, _testBasePath);

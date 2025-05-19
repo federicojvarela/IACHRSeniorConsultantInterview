@@ -41,7 +41,7 @@ namespace Infrastructure.Storage
         /// </summary>
         public async Task InitAsync()
         {
-            if (_fileSystem.FileExists(_documentsFilePath))
+            if (await _fileSystem.FileExistsAsync(_documentsFilePath))
             {
                 var json = await _fileSystem.ReadFileAsync(_documentsFilePath);
                 _documents = JsonSerializer.Deserialize<Dictionary<Guid, Document>>(json) ?? new();

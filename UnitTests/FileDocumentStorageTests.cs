@@ -21,7 +21,7 @@ using Infrastructure.Storage;
         _testFilePath = Path.Combine(_testBasePath, "documents.json");
 
         _fileSystemMock.Setup(f => f.EnsureDirectoryExists(It.IsAny<string>()));
-        _fileSystemMock.Setup(f => f.FileExists(_testFilePath)).Returns(false);
+        _fileSystemMock.Setup(f => f.FileExistsAsync(_testFilePath)).ReturnsAsync(false);
         _fileSystemMock.Setup(f => f.ReadFileAsync(_testFilePath)).ReturnsAsync("{}");
         _fileSystemMock.Setup(f => f.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.CompletedTask);
     }

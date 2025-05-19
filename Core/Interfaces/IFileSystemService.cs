@@ -10,7 +10,7 @@
         /// </summary>
         /// <param name="path">Ruta del archivo a verificar.</param>
         /// <returns>Verdadero si el archivo existe, falso en caso contrario.</returns>
-        bool FileExists(string path);
+        Task<bool> FileExistsAsync(string path);
 
         /// <summary>
         /// Lee el contenido de un archivo de forma asíncrona.
