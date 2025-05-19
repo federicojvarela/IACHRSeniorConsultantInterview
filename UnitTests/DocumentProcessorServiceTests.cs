@@ -84,5 +84,20 @@ namespace UnitTests
             Assert.Equal(document, result);
             _mockDocumentRepository.Verify(r => r.GetByIdAsync(docId), Times.Once);
         }
+
+        [Fact]
+        public async Task GetDocumentShouldReturnNullWhenRepositoryReturnsNull()
+        {
+            // Arrange
+            var docId = Guid.NewGuid();
+            _mockDocumentRepository.Setup(r => r.GetByIdAsync(docId)).ReturnsAsync((Document?)null);
+
+            // Act
+            var result = await _service.GetDocument(docId);
+
+            // Assert
+            Assert.Null(result);
+            _mockDocumentRepository.Verify(r => r.GetByIdAsync(docId), Times.Once);
+        }
     }
 }

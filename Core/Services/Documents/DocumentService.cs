@@ -130,7 +130,7 @@ namespace Core.Services.Documents
         /// </summary>
         /// <param name="id">Identificador único del documento.</param>
         /// <returns>El documento encontrado o null si no existe.</returns>
-        public async Task<Document> GetDocument(Guid id)
+        public async Task<Document?> GetDocument(Guid id)
         {
             return await _documentRepository.GetByIdAsync(id);
         }
